@@ -684,19 +684,17 @@ const LOCAL_PORTS = {
 
 function getServiceUrl(service) {
   const host = window.location.hostname;
-  const protocol = window.location.protocol;
+  const port = window.location.port;
   
-  const isProdDomain = host.endsWith("sathvikdevops.online");
-  
-  if (isProdDomain) {
-    // Subdomain-based routing in production: e.g. recipes.sathvikdevops.online
-    const parts = host.split('.');
-    const parentDomain = parts.length > 2 ? parts.slice(1).join('.') : host;
-    return `${protocol}//${service}.${parentDomain}/api/${service}`;
-  } else {
-    // Fallback for localhost, local IPs, or custom local domains
+  // If we are in local development (accessing via port 3000, e.g. localhost:3000)
+  if (port === '3000') {
+    const protocol = window.location.protocol;
     return `${protocol}//${host || 'localhost'}:${LOCAL_PORTS[service]}/api/${service}`;
   }
+  
+  // In production (behind Nginx proxy), use relative paths to route to the same origin
+  // E.g. /api/recipes, which avoids CORS and subdomain DNS issues
+  return `/api/${service}`;
 }
 
 async function api(service, path = '', method = 'GET', body = null) {
