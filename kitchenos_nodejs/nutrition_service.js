@@ -12,10 +12,17 @@ const SEED_NUTRITION = [
 ];
 
 // Initialize database with seeds if empty
-if (readCollection("nutrition").length === 0) {
-  console.log("[Nutrition] Seeding nutrition log datastore...");
-  writeCollection("nutrition", SEED_NUTRITION);
-}
+(async () => {
+  try {
+    const existing = await readCollection("nutrition");
+    if (existing.length === 0) {
+      console.log("[Nutrition] Seeding nutrition log datastore...");
+      await writeCollection("nutrition", SEED_NUTRITION);
+    }
+  } catch (err) {
+    console.error("[Nutrition] Seeding error:", err);
+  }
+})();
 
 function sendJSON(res, status, data) {
   const body = JSON.stringify(data);
@@ -29,7 +36,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -49,8 +56,8 @@ const server = http.createServer((req, res) => {
   // Route: /api/nutrition or /api/nutrition/<id>
   if (pathParts[0] === "api" && pathParts[1] === "nutrition") {
     const id = pathParts[2] || null;
-    const nutritionLog = readCollection("nutrition");
-    const recipes = readCollection("recipes");
+    const nutritionLog = await readCollection("nutrition");
+    const recipes = await readCollection("recipes");
 
     if (method === "GET") {
       const dateFilter = parsedUrl.query.date;
@@ -93,14 +100,14 @@ const server = http.createServer((req, res) => {
     if (method === "POST") {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           if (!body.recipe_id || body.servings === undefined) {
             return sendJSON(res, 400, { error: "recipe_id and servings are required" });
           }
 
-          const newId = generateId("nutrition", "n");
+          const newId = await generateId("nutrition", "n");
           const newLog = {
             id: newId,
             recipe_id: body.recipe_id,
@@ -111,7 +118,7 @@ const server = http.createServer((req, res) => {
           };
 
           nutritionLog.push(newLog);
-          writeCollection("nutrition", nutritionLog);
+          await writeCollection("nutrition", nutritionLog);
           sendJSON(res, 201, newLog);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -126,7 +133,7 @@ const server = http.createServer((req, res) => {
         return sendJSON(res, 404, { error: "Log entry not found" });
       }
       const deleted = nutritionLog.splice(idx, 1)[0];
-      writeCollection("nutrition", nutritionLog);
+      await writeCollection("nutrition", nutritionLog);
       return sendJSON(res, 200, { message: "Log entry removed", deleted });
     }
   }

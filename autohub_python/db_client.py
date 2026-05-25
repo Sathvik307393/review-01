@@ -104,6 +104,48 @@ class LocalCollection:
         return len(self.find(filter_dict))
 
 
+class MongoCollectionWrapper:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def find(self, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+        cursor = self.collection.find(filter_dict)
+        results = []
+        for doc in cursor:
+            if "_id" in doc:
+                doc["_id"] = str(doc["_id"])
+            results.append(doc)
+        return results
+
+    def find_one(self, filter_dict):
+        doc = self.collection.find_one(filter_dict)
+        if doc and "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        return doc
+
+    def insert_one(self, document):
+        if "_id" not in document:
+            import uuid
+            document["_id"] = str(uuid.uuid4())
+        self.collection.insert_one(document)
+        return document
+
+    def update_one(self, filter_dict, update_dict):
+        result = self.collection.update_one(filter_dict, update_dict)
+        return result.modified_count > 0 or result.matched_count > 0
+
+    def delete_one(self, filter_dict):
+        result = self.collection.delete_one(filter_dict)
+        return result.deleted_count > 0
+
+    def count_documents(self, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+        return self.collection.count_documents(filter_dict)
+
+
 class DBClient:
     def __init__(self):
         self.mongo_uri = os.environ.get("MONGO_URI")
@@ -128,7 +170,7 @@ class DBClient:
     def get_collection(self, name):
         if self.use_mongo:
             # Wrap standard PyMongo collection wrapper to ensure compatible API
-            return self.db[name]
+            return MongoCollectionWrapper(self.db[name])
         else:
             filename = f"db_{name}.json"
             return LocalCollection(filename)

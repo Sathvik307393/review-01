@@ -79,10 +79,17 @@ const SEED_RECIPES = [
 ];
 
 // Initialize database with seeds if empty
-if (readCollection("recipes").length === 0) {
-  console.log("[Recipes] Seeding Indian vegetarian recipes datastore...");
-  writeCollection("recipes", SEED_RECIPES);
-}
+(async () => {
+  try {
+    const existing = await readCollection("recipes");
+    if (existing.length === 0) {
+      console.log("[Recipes] Seeding Indian vegetarian recipes datastore...");
+      await writeCollection("recipes", SEED_RECIPES);
+    }
+  } catch (err) {
+    console.error("[Recipes] Seeding error:", err);
+  }
+})();
 
 function sendJSON(res, status, data) {
   const body = JSON.stringify(data);
@@ -96,7 +103,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -116,7 +123,7 @@ const server = http.createServer((req, res) => {
   // Route: /api/recipes or /api/recipes/<id>
   if (pathParts[0] === "api" && pathParts[1] === "recipes") {
     const id = pathParts[2] || null;
-    const recipes = readCollection("recipes");
+    const recipes = await readCollection("recipes");
 
     if (method === "GET") {
       if (id) {
@@ -144,14 +151,14 @@ const server = http.createServer((req, res) => {
     if (method === "POST") {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           if (!body.name || !body.category) {
             return sendJSON(res, 400, { error: "Name and Category are required" });
           }
 
-          const newId = generateId("recipes", "r");
+          const newId = await generateId("recipes", "r");
           const newRecipe = {
             id: newId,
             name: body.name,
@@ -168,7 +175,7 @@ const server = http.createServer((req, res) => {
           };
 
           recipes.push(newRecipe);
-          writeCollection("recipes", recipes);
+          await writeCollection("recipes", recipes);
           sendJSON(res, 201, newRecipe);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -183,7 +190,7 @@ const server = http.createServer((req, res) => {
         return sendJSON(res, 404, { error: "Recipe not found" });
       }
       const deleted = recipes.splice(idx, 1)[0];
-      writeCollection("recipes", recipes);
+      await writeCollection("recipes", recipes);
       return sendJSON(res, 200, { message: "Recipe removed", deleted });
     }
   }

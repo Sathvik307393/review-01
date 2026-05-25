@@ -16,10 +16,17 @@ const SEED_PANTRY = [
 ];
 
 // Initialize database with seeds if empty
-if (readCollection("pantry").length === 0) {
-  console.log("[Pantry] Seeding Indian pantry items datastore...");
-  writeCollection("pantry", SEED_PANTRY);
-}
+(async () => {
+  try {
+    const existing = await readCollection("pantry");
+    if (existing.length === 0) {
+      console.log("[Pantry] Seeding Indian pantry items datastore...");
+      await writeCollection("pantry", SEED_PANTRY);
+    }
+  } catch (err) {
+    console.error("[Pantry] Seeding error:", err);
+  }
+})();
 
 function sendJSON(res, status, data) {
   const body = JSON.stringify(data);
@@ -33,7 +40,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -53,7 +60,7 @@ const server = http.createServer((req, res) => {
   // Route: /api/pantry or /api/pantry/<id>
   if (pathParts[0] === "api" && pathParts[1] === "pantry") {
     const id = pathParts[2] || null;
-    const pantry = readCollection("pantry");
+    const pantry = await readCollection("pantry");
 
     if (method === "GET") {
       if (id) {
@@ -85,14 +92,14 @@ const server = http.createServer((req, res) => {
     if (method === "POST") {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           if (!body.name || !body.category || body.quantity === undefined) {
             return sendJSON(res, 400, { error: "Name, Category and Quantity are required" });
           }
 
-          const newId = generateId("pantry", "p");
+          const newId = await generateId("pantry", "p");
           const newItem = {
             id: newId,
             name: body.name,
@@ -104,7 +111,7 @@ const server = http.createServer((req, res) => {
           };
 
           pantry.push(newItem);
-          writeCollection("pantry", pantry);
+          await writeCollection("pantry", pantry);
           sendJSON(res, 201, newItem);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -116,7 +123,7 @@ const server = http.createServer((req, res) => {
     if (method === "PUT" && id) {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           const idx = pantry.findIndex(i => i.id === id);
@@ -126,7 +133,7 @@ const server = http.createServer((req, res) => {
 
           const updatedItem = { ...pantry[idx], ...body };
           pantry[idx] = updatedItem;
-          writeCollection("pantry", pantry);
+          await writeCollection("pantry", pantry);
           sendJSON(res, 200, updatedItem);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -141,7 +148,7 @@ const server = http.createServer((req, res) => {
         return sendJSON(res, 404, { error: "Item not found" });
       }
       const deleted = pantry.splice(idx, 1)[0];
-      writeCollection("pantry", pantry);
+      await writeCollection("pantry", pantry);
       return sendJSON(res, 200, { message: "Item removed", deleted });
     }
   }

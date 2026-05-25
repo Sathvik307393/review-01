@@ -12,10 +12,17 @@ const SEED_MEAL_PLANS = [
 ];
 
 // Initialize database with seeds if empty
-if (readCollection("planner").length === 0) {
-  console.log("[Planner] Seeding meal planner datastore...");
-  writeCollection("planner", SEED_MEAL_PLANS);
-}
+(async () => {
+  try {
+    const existing = await readCollection("planner");
+    if (existing.length === 0) {
+      console.log("[Planner] Seeding meal planner datastore...");
+      await writeCollection("planner", SEED_MEAL_PLANS);
+    }
+  } catch (err) {
+    console.error("[Planner] Seeding error:", err);
+  }
+})();
 
 function sendJSON(res, status, data) {
   const body = JSON.stringify(data);
@@ -29,7 +36,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -49,8 +56,8 @@ const server = http.createServer((req, res) => {
   // Route: /api/planner or /api/planner/<id>
   if (pathParts[0] === "api" && pathParts[1] === "planner") {
     const id = pathParts[2] || null;
-    const plans = readCollection("planner");
-    const recipes = readCollection("recipes");
+    const plans = await readCollection("planner");
+    const recipes = await readCollection("recipes");
 
     if (method === "GET") {
       if (id) {
@@ -98,14 +105,14 @@ const server = http.createServer((req, res) => {
     if (method === "POST") {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           if (!body.recipe_id || !body.date || !body.meal_type || body.servings === undefined) {
             return sendJSON(res, 400, { error: "recipe_id, date, meal_type and servings are required" });
           }
 
-          const newId = generateId("planner", "m");
+          const newId = await generateId("planner", "m");
           const newPlan = {
             id: newId,
             recipe_id: body.recipe_id,
@@ -116,7 +123,7 @@ const server = http.createServer((req, res) => {
           };
 
           plans.push(newPlan);
-          writeCollection("planner", plans);
+          await writeCollection("planner", plans);
 
           const recipeDetail = recipes.find(r => r.id === newPlan.recipe_id) || null;
           sendJSON(res, 201, { ...newPlan, recipe: recipeDetail });
@@ -133,7 +140,7 @@ const server = http.createServer((req, res) => {
         return sendJSON(res, 404, { error: "Meal plan entry not found" });
       }
       const deleted = plans.splice(idx, 1)[0];
-      writeCollection("planner", plans);
+      await writeCollection("planner", plans);
       return sendJSON(res, 200, { message: "Plan entry removed", deleted });
     }
   }

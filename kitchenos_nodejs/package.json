@@ -1,0 +1,14 @@
+{
+  "name": "kitchenos-nodejs-platform",
+  "version": "1.0.0",
+  "description": "KitchenOS Multi-process Node.js Microservices Platform",
+  "main": "run_all.js",
+  "scripts": {
+    "start": "node run_all.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

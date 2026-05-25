@@ -95,7 +95,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -117,13 +117,13 @@ const server = http.createServer((req, res) => {
     if (method === "GET") {
       const mem = getMemoryUsage();
       
-      // Grab record counts from local JSON collections
+      // Grab record counts from local/remote collections
       const counts = {
-        recipes: readCollection("recipes").length,
-        pantry: readCollection("pantry").length,
-        planner: readCollection("planner").length,
-        shopping: readCollection("shopping").length,
-        nutrition: readCollection("nutrition").length
+        recipes: (await readCollection("recipes")).length,
+        pantry: (await readCollection("pantry")).length,
+        planner: (await readCollection("planner")).length,
+        shopping: (await readCollection("shopping")).length,
+        nutrition: (await readCollection("nutrition")).length
       };
 
       // Construct metrics response

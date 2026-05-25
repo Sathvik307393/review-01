@@ -14,10 +14,17 @@ const SEED_SHOPPING = [
 ];
 
 // Initialize database with seeds if empty
-if (readCollection("shopping").length === 0) {
-  console.log("[Shopping] Seeding shopping list datastore...");
-  writeCollection("shopping", SEED_SHOPPING);
-}
+(async () => {
+  try {
+    const existing = await readCollection("shopping");
+    if (existing.length === 0) {
+      console.log("[Shopping] Seeding shopping list datastore...");
+      await writeCollection("shopping", SEED_SHOPPING);
+    }
+  } catch (err) {
+    console.error("[Shopping] Seeding error:", err);
+  }
+})();
 
 function sendJSON(res, status, data) {
   const body = JSON.stringify(data);
@@ -31,7 +38,7 @@ function sendJSON(res, status, data) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
   const method = req.method;
@@ -51,8 +58,8 @@ const server = http.createServer((req, res) => {
   // Route: /api/shopping or /api/shopping/<id>
   if (pathParts[0] === "api" && pathParts[1] === "shopping") {
     const id = pathParts[2] || null;
-    const shoppingList = readCollection("shopping");
-    const recipes = readCollection("recipes");
+    const shoppingList = await readCollection("shopping");
+    const recipes = await readCollection("recipes");
 
     if (method === "GET") {
       const unchecked = shoppingList.filter(i => !i.checked).length;
@@ -80,14 +87,14 @@ const server = http.createServer((req, res) => {
     if (method === "POST") {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           if (!body.item || !body.category || body.quantity === undefined) {
             return sendJSON(res, 400, { error: "item, category and quantity are required" });
           }
 
-          const newId = generateId("shopping", "sh");
+          const newId = await generateId("shopping", "sh");
           const newItem = {
             id: newId,
             item: body.item,
@@ -100,7 +107,7 @@ const server = http.createServer((req, res) => {
           };
 
           shoppingList.push(newItem);
-          writeCollection("shopping", shoppingList);
+          await writeCollection("shopping", shoppingList);
           sendJSON(res, 201, newItem);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -112,7 +119,7 @@ const server = http.createServer((req, res) => {
     if (method === "PUT" && id) {
       let bodyStr = "";
       req.on("data", chunk => { bodyStr += chunk; });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const body = JSON.parse(bodyStr || "{}");
           const idx = shoppingList.findIndex(i => i.id === id);
@@ -122,7 +129,7 @@ const server = http.createServer((req, res) => {
 
           const updatedItem = { ...shoppingList[idx], ...body };
           shoppingList[idx] = updatedItem;
-          writeCollection("shopping", shoppingList);
+          await writeCollection("shopping", shoppingList);
           sendJSON(res, 200, updatedItem);
         } catch (e) {
           sendJSON(res, 400, { error: "Invalid JSON input" });
@@ -137,7 +144,7 @@ const server = http.createServer((req, res) => {
         return sendJSON(res, 404, { error: "Item not found" });
       }
       const deleted = shoppingList.splice(idx, 1)[0];
-      writeCollection("shopping", shoppingList);
+      await writeCollection("shopping", shoppingList);
       return sendJSON(res, 200, { message: "Item removed", deleted });
     }
   }
