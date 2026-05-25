@@ -1,0 +1,52 @@
+[
+  {
+    "id": "sh1",
+    "item": "Fresh Paneer",
+    "category": "Dairy",
+    "quantity": 400,
+    "unit": "g",
+    "checked": false,
+    "recipe_id": "r2",
+    "priority": "high"
+  },
+  {
+    "id": "sh2",
+    "item": "Heavy Cream",
+    "category": "Dairy",
+    "quantity": 200,
+    "unit": "ml",
+    "checked": false,
+    "recipe_id": "r2",
+    "priority": "high"
+  },
+  {
+    "id": "sh3",
+    "item": "Basmati Rice",
+    "category": "Grains",
+    "quantity": 1,
+    "unit": "kg",
+    "checked": true,
+    "recipe_id": "r1",
+    "priority": "medium"
+  },
+  {
+    "id": "sh4",
+    "item": "Green Peas",
+    "category": "Produce",
+    "quantity": 250,
+    "unit": "g",
+    "checked": false,
+    "recipe_id": "r4",
+    "priority": "low"
+  },
+  {
+    "id": "sh5",
+    "item": "Kasuri Methi",
+    "category": "Spices",
+    "quantity": 50,
+    "unit": "g",
+    "checked": false,
+    "recipe_id": "r2",
+    "priority": "medium"
+  }
+]

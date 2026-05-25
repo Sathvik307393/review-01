@@ -1,0 +1,38 @@
+[
+  {
+    "id": "i1",
+    "car_id": "c1",
+    "provider": "HDFC ERGO General Insurance",
+    "policy_no": "HE-2024-441",
+    "type": "Comprehensive",
+    "premium": 45000,
+    "start": "2024-01-01",
+    "end": "2025-01-01",
+    "status": "active",
+    "_id": "i1"
+  },
+  {
+    "id": "i2",
+    "car_id": "c3",
+    "provider": "ICICI Lombard Auto Co.",
+    "policy_no": "IL-2024-882",
+    "type": "Third Party",
+    "premium": 8500,
+    "start": "2024-02-15",
+    "end": "2025-02-15",
+    "status": "active",
+    "_id": "i2"
+  },
+  {
+    "id": "i3",
+    "car_id": "c5",
+    "provider": "Tata AIG Insurance Ltd.",
+    "policy_no": "TA-2024-003",
+    "type": "Comprehensive",
+    "premium": 32000,
+    "start": "2024-03-01",
+    "end": "2025-03-01",
+    "status": "active",
+    "_id": "i3"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "m1",
+    "recipe_id": "r1",
+    "date": "2026-05-25",
+    "meal_type": "breakfast",
+    "servings": 2,
+    "notes": "South Indian breakfast"
+  },
+  {
+    "id": "m2",
+    "recipe_id": "r2",
+    "date": "2026-05-25",
+    "meal_type": "dinner",
+    "servings": 4,
+    "notes": "Special Paneer dinner"
+  },
+  {
+    "id": "m3",
+    "recipe_id": "r4",
+    "date": "2026-05-26",
+    "meal_type": "lunch",
+    "servings": 4,
+    "notes": "Quick Aloo Gobi lunch"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "car_id": "c1",
+    "date": "2024-04-20",
+    "litres": 45.2,
+    "cost_per_litre": 102.5,
+    "odometer": 14800,
+    "full_tank": true,
+    "_id": "f1"
+  },
+  {
+    "id": "f2",
+    "car_id": "c3",
+    "date": "2024-04-18",
+    "litres": 38.0,
+    "cost_per_litre": 104.2,
+    "odometer": 24900,
+    "full_tank": true,
+    "_id": "f2"
+  },
+  {
+    "id": "f3",
+    "car_id": "c1",
+    "date": "2024-03-30",
+    "litres": 42.0,
+    "cost_per_litre": 101.8,
+    "odometer": 14200,
+    "full_tank": true,
+    "_id": "f3"
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "p1",
+    "name": "Basmati Rice",
+    "category": "Grains",
+    "quantity": 1500,
+    "unit": "g",
+    "min_quantity": 500,
+    "expiry": "2026-12-31"
+  },
+  {
+    "id": "p2",
+    "name": "Paneer Block",
+    "category": "Dairy",
+    "quantity": 400,
+    "unit": "g",
+    "min_quantity": 200,
+    "expiry": "2026-06-15"
+  },
+  {
+    "id": "p3",
+    "name": "Toor Dal",
+    "category": "Lentils",
+    "quantity": 1000,
+    "unit": "g",
+    "min_quantity": 400,
+    "expiry": "2026-12-31"
+  },
+  {
+    "id": "p4",
+    "name": "Mustard Seeds",
+    "category": "Spices",
+    "quantity": 150,
+    "unit": "g",
+    "min_quantity": 50,
+    "expiry": "2027-01-01"
+  },
+  {
+    "id": "p5",
+    "name": "Pure Ghee",
+    "category": "Fats",
+    "quantity": 500,
+    "unit": "ml",
+    "min_quantity": 200,
+    "expiry": "2026-09-30"
+  },
+  {
+    "id": "p6",
+    "name": "Fresh Tomatoes",
+    "category": "Produce",
+    "quantity": 800,
+    "unit": "g",
+    "min_quantity": 400,
+    "expiry": "2026-05-30"
+  },
+  {
+    "id": "p7",
+    "name": "Ginger-Garlic Paste",
+    "category": "Condiments",
+    "quantity": 150,
+    "unit": "g",
+    "min_quantity": 50,
+    "expiry": "2026-08-15"
+  }
+]

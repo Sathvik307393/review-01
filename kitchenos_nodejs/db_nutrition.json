@@ -1,0 +1,26 @@
+[
+  {
+    "id": "n1",
+    "recipe_id": "r1",
+    "date": "2026-05-25",
+    "meal_type": "breakfast",
+    "servings": 1,
+    "notes": "Delicious crispy dosa"
+  },
+  {
+    "id": "n2",
+    "recipe_id": "r2",
+    "date": "2026-05-25",
+    "meal_type": "dinner",
+    "servings": 1,
+    "notes": "With butter naan"
+  },
+  {
+    "id": "n3",
+    "recipe_id": "r5",
+    "date": "2026-05-25",
+    "meal_type": "snack",
+    "servings": 1,
+    "notes": "Afternoon refreshment"
+  }
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "id": "r1",
+    "name": "Classic Masala Dosa",
+    "category": "Breakfast",
+    "cuisine": "Indian (South)",
+    "prep": 15,
+    "cook": 20,
+    "servings": 2,
+    "difficulty": "Medium",
+    "calories": 380,
+    "ingredients": [
+      "rice batter",
+      "potatoes",
+      "onions",
+      "mustard seeds",
+      "curry leaves",
+      "turmeric",
+      "ghee"
+    ],
+    "tags": [
+      "breakfast",
+      "south-indian",
+      "veg",
+      "crispy"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "r2",
+    "name": "Paneer Butter Masala",
+    "category": "Curry",
+    "cuisine": "Indian (North)",
+    "prep": 15,
+    "cook": 25,
+    "servings": 4,
+    "difficulty": "Medium",
+    "calories": 450,
+    "ingredients": [
+      "paneer",
+      "butter",
+      "tomatoes",
+      "cashews",
+      "cream",
+      "garam masala",
+      "kasuri methi"
+    ],
+    "tags": [
+      "curry",
+      "north-indian",
+      "veg",
+      "rich"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "r3",
+    "name": "Dal Makhani",
+    "category": "Curry",
+    "cuisine": "Indian (North)",
+    "prep": 10,
+    "cook": 60,
+    "servings": 6,
+    "difficulty": "Hard",
+    "calories": 390,
+    "ingredients": [
+      "black lentils",
+      "kidney beans",
+      "butter",
+      "heavy cream",
+      "ginger",
+      "garlic",
+      "tomato puree"
+    ],
+    "tags": [
+      "curry",
+      "slow-cook",
+      "veg",
+      "creamy"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "r4",
+    "name": "Aloo Gobi Matar",
+    "category": "Dry Curry",
+    "cuisine": "Indian",
+    "prep": 10,
+    "cook": 20,
+    "servings": 4,
+    "difficulty": "Easy",
+    "calories": 210,
+    "ingredients": [
+      "potatoes",
+      "cauliflower",
+      "green peas",
+      "ginger",
+      "turmeric",
+      "coriander powder"
+    ],
+    "tags": [
+      "dry-curry",
+      "veg",
+      "quick",
+      "healthy"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": "r5",
+    "name": "Chocolate Milkshake",
+    "category": "Beverage",
+    "cuisine": "Global",
+    "prep": 5,
+    "cook": 5,
+    "servings": 1,
+    "difficulty": "Easy",
+    "calories": 320,
+    "ingredients": [
+      "milk",
+      "chocolate syrup",
+      "cocoa powder",
+      "chocolate ice cream",
+      "sugar"
+    ],
+    "tags": [
+      "beverage",
+      "sweet",
+      "cold",
+      "chocolate"
+    ],
+    "image_url": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80"
+  }
+]

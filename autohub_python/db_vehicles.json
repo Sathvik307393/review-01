@@ -1,0 +1,74 @@
+[
+  {
+    "id": "c1",
+    "make": "Mahindra",
+    "model": "XUV700",
+    "year": 2023,
+    "color": "Midnight Black",
+    "mileage": 15000,
+    "status": "available",
+    "price": 2200000,
+    "image_url": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80",
+    "_id": "c1"
+  },
+  {
+    "id": "c2",
+    "make": "Tata",
+    "model": "Nexon EV",
+    "year": 2023,
+    "color": "Empowered Oxide",
+    "mileage": 8000,
+    "status": "sold",
+    "price": 1750000,
+    "image_url": "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80",
+    "_id": "c2"
+  },
+  {
+    "id": "c3",
+    "make": "Maruti Suzuki",
+    "model": "Swift",
+    "year": 2022,
+    "color": "Solid Fire Red",
+    "mileage": 25000,
+    "status": "available",
+    "price": 750000,
+    "image_url": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=600&q=80",
+    "_id": "c3"
+  },
+  {
+    "id": "c4",
+    "make": "Mahindra",
+    "model": "Thar 4x4",
+    "year": 2023,
+    "color": "Rocky Beige",
+    "mileage": 12000,
+    "status": "reserved",
+    "price": 1600000,
+    "image_url": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=600&q=80",
+    "_id": "c4"
+  },
+  {
+    "id": "c5",
+    "make": "Hyundai",
+    "model": "Creta",
+    "year": 2023,
+    "color": "Ranger Khaki",
+    "mileage": 18000,
+    "status": "available",
+    "price": 1850000,
+    "image_url": "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80",
+    "_id": "c5"
+  },
+  {
+    "_id": "c6",
+    "id": "c6",
+    "make": "Maruti Suzuki",
+    "model": "Alto LX",
+    "year": 20001,
+    "color": "Red",
+    "mileage": 153478,
+    "price": 500000,
+    "status": "available",
+    "image_url": "https://www.team-bhp.com/forum/attachments/long-term-ownership-reviews/1341758d1424423170-maruti-suzuki-alto-lx-1-2-lakh-kms-report-teambhpaltofront.jpg"
+  }
+]

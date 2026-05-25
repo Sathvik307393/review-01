@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KitchenOS — Culinary Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg-main: #06080e;
+    --bg-radial: radial-gradient(circle at 50% 0%, #111827, #06080e);
+    --surface-glass: rgba(17, 24, 39, 0.65);
+    --surface-solid: #0f172a;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-active: rgba(217, 142, 59, 0.4);
+    --text-primary: #f3f4f6;
+    --text-muted: #9ca3af;
+    --accent: #2d7c38; /* Rosemary Green */
+    --accent-hover: #225f2a;
+    --accent-glow: rgba(45, 124, 56, 0.25);
+    --accent2: #d98e3b; /* Apricot Gold */
+    --accent2-hover: #bd782d;
+    --accent2-glow: rgba(217, 142, 59, 0.2);
+    --red: #cf4b4b; /* Chili Red */
+    --red-bg: rgba(207, 75, 75, 0.12);
+    --green: #4ade80; /* Herb Green */
+    --green-bg: rgba(74, 222, 128, 0.12);
+    --yellow: #fbbf24; /* Honey Gold */
+    --yellow-bg: rgba(251, 191, 36, 0.12);
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --glass-blur: blur(12px);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    background: var(--bg-radial); 
+    background-attachment: fixed;
+    color: var(--text-primary); 
+    font-family: var(--font-body); 
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background: rgba(10, 15, 26, 0.85); 
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 3rem; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    height: 72px;
+    position: sticky; 
+    top: 0; 
+    z-index: 100;
+  }
+  .logo { 
+    font-family: var(--font-heading); 
+    font-size: 1.8rem; 
+    font-weight: 700; 
+    color: var(--text-primary); 
+    letter-spacing: -0.02em; 
+  }
+  .logo span { color: var(--accent2); }
+  
+  nav { display: flex; gap: 0.75rem; }
+  nav button {
+    background: transparent; 
+    border: none; 
+    color: var(--text-muted);
+    font-family: var(--font-heading); 
+    font-size: 0.95rem; 
+    font-weight: 500;
+    padding: 0.5rem 1.25rem; 
+    border-radius: 100px; 
+    cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+  }
+  nav button:hover { 
+    color: var(--text-primary); 
+    background: rgba(255, 255, 255, 0.03); 
+  }
+  nav button.active { 
+    background: var(--accent2-glow); 
+    color: var(--accent2); 
+    border-color: var(--accent2);
+    font-weight: 600; 
+    box-shadow: 0 0 15px rgba(217, 142, 59, 0.15);
+  }
+
+  .breadcrumb {
+    padding: 0.6rem 3rem;
+    font-size: 0.8rem; 
+    color: var(--text-muted);
+    background: rgba(15, 23, 42, 0.5);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+  }
+  .breadcrumb span { color: var(--accent2); }
+
+  main { max-width: 1400px; margin: 0 auto; padding: 2.5rem 3rem; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 2.4rem; 
+    font-weight: 700; 
+    margin-bottom: 2rem; 
+    letter-spacing: -0.01em;
+  }
+  h2 em { font-style: italic; color: var(--accent2); font-weight: 400; }
+
+  .stats-row { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 1.5rem; 
+    margin-bottom: 2.5rem; 
+  }
+  .stat {
+    background: var(--surface-glass);
+    border: 1px solid var(--border);
+    border-radius: 16px; 
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.3s;
+  }
+  .stat:hover {
+    border-color: var(--border-active);
+  }
+  .stat-label { 
+    font-family: var(--font-heading);
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.12em; 
+    color: var(--text-muted); 
+    margin-bottom: 0.5rem; 
+  }
+  .stat-val { 
+    font-family: var(--font-heading); 
+    font-size: 2.4rem; 
+    font-weight: 700; 
+    color: var(--accent2); 
+    line-height: 1.1;
+  }
+  .stat-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+  .grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); 
+    gap: 2rem; 
+    margin-bottom: 3rem; 
+  }
+
+  .card {
+    background: var(--surface-glass); 
+    border: 1px solid var(--border);
+    border-radius: 20px; 
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    backdrop-filter: var(--glass-blur);
+  }
+  .card:hover { 
+    border-color: var(--border-active);
+    transform: translateY(-5px); 
+    box-shadow: 0 20px 40px rgba(217, 142, 59, 0.08), 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+  .card-img-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    background: #111827;
+  }
+  .card-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card:hover .card-img {
+    transform: scale(1.08);
+  }
+  .card-img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(6, 8, 14, 0.95), transparent);
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-end;
+  }
+  .card-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .card-title { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    line-height: 1.3; 
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  .card-meta { 
+    font-size: 0.85rem; 
+    color: var(--text-muted); 
+    margin-bottom: 0.8rem; 
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .recipe-time { 
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 0.8rem; 
+    margin: 0.8rem 0; 
+    padding: 0.8rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .recipe-time span { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; }
+  .recipe-time b { color: var(--text-primary); }
+  .card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.8rem;
+  }
+
+  .badge {
+    display: inline-block; 
+    padding: 0.25rem 0.75rem; 
+    border-radius: 100px;
+    font-family: var(--font-heading);
+    font-size: 0.75rem; 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.15); }
+  .badge-red   { background: var(--red-bg); color: var(--red); border: 1px solid rgba(207, 75, 75, 0.15); }
+  .badge-yellow{ background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(251, 191, 36, 0.15); }
+  .badge-grey  { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+  .tag { 
+    display: inline-block; 
+    background: rgba(255, 255, 255, 0.04); 
+    color: var(--text-muted); 
+    padding: 0.2rem 0.6rem; 
+    border-radius: 100px; 
+    font-size: 0.75rem; 
+    margin: 0.2rem 0.2rem 0 0; 
+    border: 1px solid var(--border);
+  }
+
+  .table-wrap { 
+    overflow-x: auto; 
+    background: var(--surface-glass); 
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    margin-bottom: 2.5rem; 
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  th { 
+    padding: 1.1rem 1.5rem; 
+    text-align: left; 
+    font-family: var(--font-heading);
+    font-size: 0.8rem; 
+    font-weight: 600; 
+    letter-spacing: 0.08em; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    border-bottom: 1px solid var(--border); 
+    background: rgba(15, 23, 42, 0.4); 
+  }
+  td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  .form-section {
+    background: var(--surface-glass); 
+    border: 1px solid var(--border);
+    border-radius: 20px; 
+    padding: 2rem;
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  .form-section h3 { 
+    font-family: var(--font-heading); 
+    font-size: 1.3rem; 
+    font-weight: 600; 
+    color: var(--accent2); 
+    margin-bottom: 1.5rem; 
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .form-row { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 1.25rem; 
+    margin-bottom: 1.25rem; 
+  }
+  label { 
+    font-family: var(--font-heading);
+    font-size: 0.75rem; 
+    font-weight: 500;
+    text-transform: uppercase; 
+    letter-spacing: 0.08em; 
+    color: var(--text-muted); 
+    margin-bottom: 0.5rem; 
+    display: block; 
+  }
+  input, select, textarea {
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid var(--border); 
+    color: var(--text-primary);
+    padding: 0.65rem 1rem; 
+    border-radius: 10px; 
+    font-size: 0.95rem;
+    font-family: var(--font-body); 
+    width: 100%; 
+    transition: all 0.3s;
+  }
+  input:focus, select:focus, textarea:focus { 
+    outline: none; 
+    border-color: var(--accent2); 
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 10px rgba(217, 142, 59, 0.1);
+  }
+  
+  .btn {
+    background: var(--accent2); 
+    color: #06080e; 
+    border: none;
+    padding: 0.7rem 1.6rem; 
+    border-radius: 100px;
+    font-family: var(--font-heading); 
+    font-size: 0.9rem; 
+    font-weight: 600;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(217, 142, 59, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn:hover { 
+    background: var(--accent2-hover); 
+    transform: translateY(-1px); 
+    box-shadow: 0 6px 16px rgba(217, 142, 59, 0.3);
+  }
+  .btn:active { transform: translateY(0); }
+  .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+  .btn-outline { 
+    background: transparent; 
+    color: var(--accent2); 
+    border: 1px solid var(--accent2); 
+    box-shadow: none;
+  }
+  .btn-outline:hover { 
+    background: var(--accent2-glow); 
+    color: var(--accent2); 
+  }
+  .btn-warn { 
+    background: transparent; 
+    color: var(--red); 
+    border: 1px solid var(--red);
+    box-shadow: none;
+  }
+  .btn-warn:hover { 
+    background: var(--red-bg); 
+    color: var(--red); 
+    border-color: var(--red);
+    box-shadow: none;
+  }
+
+  .loading { color: var(--text-muted); text-align: center; padding: 3rem; font-style: italic; }
+  .check-item { display: flex; align-items: center; gap: .6rem; }
+  .check-item input[type=checkbox] { 
+    width: 18px; 
+    height: 18px; 
+    accent-color: var(--accent2); 
+    cursor: pointer; 
+  }
+
+  /* Metrics Panel Custom Layout */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 900px) {
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .chart-container {
+    background: var(--surface-glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    height: 350px;
+    position: relative;
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  .chart-container h4 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .text-green { color: var(--green) !important; }
+  .text-yellow { color: var(--yellow) !important; }
+  .text-red { color: var(--red) !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Kitchen<span>OS</span></div>
+  <nav>
+    <button class="active" onclick="nav('recipes')">Recipes</button>
+    <button onclick="nav('pantry')">Pantry</button>
+    <button onclick="nav('planner')">Meal Planner</button>
+    <button onclick="nav('shopping')">Shopping</button>
+    <button onclick="nav('nutrition')">Nutrition</button>
+    <button onclick="nav('metrics')">Metrics</button>
+  </nav>
+</header>
+<div class="breadcrumb">KitchenOS &nbsp;›&nbsp; <span id="bc-label">Recipe Library</span> &nbsp;|&nbsp; Multi-process Node.js &nbsp;|&nbsp; 6 Microservices</div>
+
+<main>
+  <!-- RECIPES -->
+  <div class="page active" id="page-recipes">
+    <h2>Recipe <em>Library</em> (Pure Veg & Indian Special)</h2>
+    <div class="stats-row" id="rec-stats"></div>
+    <div class="grid" id="rec-grid"><div class="loading">Loading recipes…</div></div>
+    
+    <div class="form-section">
+      <h3>➕ Add New Indian Recipe</h3>
+      <div class="form-row">
+        <div><label>Name</label><input id="r-name" placeholder="E.g. Dal Makhani"></div>
+        <div><label>Category</label><input id="r-category" placeholder="E.g. Curry"></div>
+        <div><label>Cuisine</label><input id="r-cuisine" placeholder="E.g. Indian (North)"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Prep (min)</label><input id="r-prep" type="number" placeholder="10"></div>
+        <div><label>Cook (min)</label><input id="r-cook" type="number" placeholder="20"></div>
+        <div><label>Servings</label><input id="r-servings" type="number" placeholder="4"></div>
+        <div><label>Calories/serving</label><input id="r-calories" type="number" placeholder="350"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Difficulty</label>
+          <select id="r-difficulty"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+        </div>
+        <div><label>Tags (comma separated)</label><input id="r-tags" placeholder="veg, curry, north-indian"></div>
+      </div>
+      <div class="form-row">
+        <div style="grid-column: span 1;"><label>Recipe Image URL</label><input id="r-image-url" placeholder="https://images.unsplash.com/... (optional)"></div>
+      </div>
+      <button class="btn" onclick="addRecipe()">Save Recipe</button>
+    </div>
+  </div>
+
+  <!-- PANTRY -->
+  <div class="page" id="page-pantry">
+    <h2>Pantry <em>Inventory</em> (Indian Spices & Staples)</h2>
+    <div class="stats-row" id="pan-stats"></div>
+    <div class="table-wrap"><table id="pan-table"></table></div>
+    <div class="form-section">
+      <h3>➕ Add Pantry Item</h3>
+      <div class="form-row">
+        <div><label>Item Name</label><input id="pi-name" placeholder="E.g. Basmati Rice"></div>
+        <div><label>Category</label><input id="pi-category" placeholder="E.g. Grains"></div>
+        <div><label>Quantity</label><input id="pi-quantity" type="number" placeholder="1000"></div>
+        <div><label>Unit</label><input id="pi-unit" placeholder="E.g. g or ml"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Min. Quantity (alert)</label><input id="pi-min_quantity" type="number" placeholder="200"></div>
+        <div><label>Expiry Date</label><input id="pi-expiry" type="date"></div>
+      </div>
+      <button class="btn" onclick="addPantryItem()">Add Item</button>
+    </div>
+  </div>
+
+  <!-- PLANNER -->
+  <div class="page" id="page-planner">
+    <h2>Meal <em>Planner</em></h2>
+    <div class="stats-row" id="plan-stats"></div>
+    <div class="table-wrap"><table id="plan-table"></table></div>
+    <div class="form-section">
+      <h3>➕ Plan a Meal</h3>
+      <div class="form-row">
+        <div><label>Recipe ID (e.g. r1, r2)</label><input id="mp-recipe_id" placeholder="r1"></div>
+        <div><label>Date</label><input id="mp-date" type="date"></div>
+        <div><label>Meal Type</label>
+          <select id="mp-meal_type">
+            <option>breakfast</option><option>lunch</option><option>dinner</option><option>snack</option><option>dessert</option>
+          </select>
+        </div>
+        <div><label>Servings</label><input id="mp-servings" type="number" placeholder="2"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Notes</label><input id="mp-notes" placeholder="Optional notes…"></div>
+      </div>
+      <button class="btn" onclick="addMeal()">Add to Plan</button>
+    </div>
+  </div>
+
+  <!-- SHOPPING -->
+  <div class="page" id="page-shopping">
+    <h2>Shopping <em>List</em></h2>
+    <div class="stats-row" id="shop-stats"></div>
+    <div class="table-wrap"><table id="shop-table"></table></div>
+    <div class="form-section">
+      <h3>➕ Add Item</h3>
+      <div class="form-row">
+        <div><label>Item</label><input id="si-item" placeholder="E.g. Kasuri Methi"></div>
+        <div><label>Category</label><input id="si-category" placeholder="E.g. Spices"></div>
+        <div><label>Quantity</label><input id="si-quantity" type="number" placeholder="100"></div>
+        <div><label>Unit</label><input id="si-unit" placeholder="g"></div>
+        <div><label>Priority</label>
+          <select id="si-priority"><option>high</option><option>medium</option><option>low</option></select>
+        </div>
+      </div>
+      <button class="btn" onclick="addShopItem()">Add to List</button>
+    </div>
+  </div>
+
+  <!-- NUTRITION -->
+  <div class="page" id="page-nutrition">
+    <h2>Nutrition <em>Tracker</em></h2>
+    <div class="stats-row" id="nut-stats"></div>
+    <div class="table-wrap"><table id="nut-table"></table></div>
+    <div class="form-section">
+      <h3>➕ Log a Meal</h3>
+      <div class="form-row">
+        <div><label>Recipe ID (e.g. r1, r2)</label><input id="nl-recipe_id" placeholder="r1"></div>
+        <div><label>Date</label><input id="nl-date" type="date"></div>
+        <div><label>Meal Type</label>
+          <select id="nl-meal_type">
+            <option>breakfast</option><option>lunch</option><option>dinner</option><option>snack</option>
+          </select>
+        </div>
+        <div><label>Servings</label><input id="nl-servings" type="number" placeholder="1"></div>
+      </div>
+      <button class="btn" onclick="logMeal()">Log Meal</button>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="page" id="page-metrics">
+    <h2>System & Server <em>Metrics</em></h2>
+    
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-label">Server Uptime</div>
+        <div class="stat-val" id="m-uptime">0s</div>
+        <div class="stat-sub">Since process startup</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Requests</div>
+        <div class="stat-val" id="m-requests">0</div>
+        <div class="stat-sub">All endpoints combined</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Avg Latency</div>
+        <div class="stat-val" id="m-avg-latency">0 ms</div>
+        <div class="stat-sub">Across all API routes</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">System Health</div>
+        <div class="stat-val text-green" id="m-health">Healthy</div>
+        <div class="stat-sub">CPU & Memory threshold</div>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="chart-container">
+        <h4>📈 CPU & Memory Utilization</h4>
+        <div style="position:relative; height:calc(100% - 2.5rem); width:100%">
+          <canvas id="cpuMemChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h4>📊 Endpoint Workload & Latency</h4>
+        <div style="position:relative; height:calc(100% - 2.5rem); width:100%">
+          <canvas id="apiChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:var(--accent2); margin-bottom:1.25rem; margin-top:2rem">🗂️ Datastore Record Counts</h3>
+    <div class="stats-row" style="margin-bottom:2.5rem">
+      <div class="stat">
+        <div class="stat-label">Recipes</div>
+        <div class="stat-val" id="ds-recipes" style="font-size:2rem">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pantry Items</div>
+        <div class="stat-val" id="ds-pantry" style="font-size:2rem">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Planned Meals</div>
+        <div class="stat-val" id="ds-planner" style="font-size:2rem">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Shopping Items</div>
+        <div class="stat-val" id="ds-shopping" style="font-size:2rem">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Logged Meals</div>
+        <div class="stat-val" id="ds-nutrition" style="font-size:2rem">0</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const val = id => $(id)?.value || '';
+const labels = { 
+  recipes: 'Recipe Library', 
+  pantry: 'Pantry Inventory', 
+  planner: 'Meal Planner', 
+  shopping: 'Shopping List', 
+  nutrition: 'Nutrition Tracker',
+  metrics: 'System & Server Metrics'
+};
+
+let currentTab = 'recipes';
+let cpuHistory = [];
+let memHistory = [];
+let chartLabels = [];
+let cpuMemChart = null;
+let apiChart = null;
+
+// Service ports for localhost
+const LOCAL_PORTS = {
+  'recipes': 3001,
+  'pantry': 3002,
+  'planner': 3003,
+  'shopping': 3004,
+  'nutrition': 3005,
+  'metrics': 3006
+};
+
+function getServiceUrl(service) {
+  const host = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return `${protocol}//${host}:${LOCAL_PORTS[service]}/api/${service}`;
+  } else {
+    // Subdomain-based routing in production: e.g. recipes.sathvikdevops.online
+    const parts = host.split('.');
+    const parentDomain = parts.length > 2 ? parts.slice(1).join('.') : host;
+    return `${protocol}//${service}.${parentDomain}/api/${service}`;
+  }
+}
+
+async function api(service, path = '', method = 'GET', body = null) {
+  const serviceUrl = getServiceUrl(service);
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  
+  const response = await fetch(serviceUrl + path, opts);
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || 'Request failed');
+  }
+  return response.json();
+}
+
+function nav(page) {
+  currentTab = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  const idx = ['recipes', 'pantry', 'planner', 'shopping', 'nutrition', 'metrics'].indexOf(page);
+  document.querySelectorAll('nav button')[idx].classList.add('active');
+  $('bc-label').textContent = labels[page];
+  
+  if (loaders[page]) loaders[page]();
+}
+
+const diff_colors = { Easy: 'badge-green', Medium: 'badge-yellow', Hard: 'badge-red' };
+const pri_colors = { high: 'badge-red', medium: 'badge-yellow', low: 'badge-grey' };
+
+// Set default dates
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  if ($('pi-expiry')) $('pi-expiry').value = today;
+  if ($('mp-date')) $('mp-date').value = today;
+  if ($('nl-date')) $('nl-date').value = today;
+  nav('recipes');
+});
+
+// Loaders registry
+const loaders = {
+  recipes: loadRecipes,
+  pantry: loadPantry,
+  planner: loadPlanner,
+  shopping: loadShopping,
+  nutrition: loadNutrition,
+  metrics: loadMetrics
+};
+
+// ── RECIPES ──────────────────────────────────
+async function loadRecipes() {
+  try {
+    const data = await api('recipes');
+    const list = data.recipes || [];
+    const cats = data.categories || [];
+    
+    $('rec-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Total Recipes</div><div class="stat-val">${data.total}</div></div>
+      <div class="stat"><div class="stat-label">Categories</div><div class="stat-val">${cats.length}</div></div>
+      <div class="stat"><div class="stat-label">Avg Cook Time</div><div class="stat-val">${list.length ? Math.round(list.reduce((a,r)=>a+r.cook,0)/list.length) : 0}<span style="font-size:1rem;color:var(--text-muted)">m</span></div></div>
+      <div class="stat"><div class="stat-label">Avg Calories</div><div class="stat-val">${list.length ? Math.round(list.reduce((a,r)=>a+(r.calories||0),0)/list.length) : 0}</div></div>
+    `;
+    
+    $('rec-grid').innerHTML = list.map(r => `
+      <div class="card">
+        <div class="card-img-container">
+          <img class="card-img" src="${r.image_url}" alt="${r.name}">
+          <div class="card-img-overlay">
+            <span class="badge ${diff_colors[r.difficulty] || 'badge-grey'} card-badge">${r.difficulty}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${r.name}</div>
+          <div class="card-meta">📂 ${r.category} · 🌍 ${r.cuisine}</div>
+          <div class="recipe-time">
+            <span>⏱️ Prep: <b>${r.prep}m</b></span>
+            <span>🔥 Cook: <b>${r.cook}m</b></span>
+            <span>🍽️ <b>${r.servings}</b> Portions</span>
+          </div>
+          <div class="card-meta">⚡ <b>${r.calories}</b> kcal/serving</div>
+          <div style="margin-top:0.5rem">${(r.tags || []).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          <div class="card-footer">
+            <span style="font-size:0.75rem;color:var(--text-muted)">ID: <b>${r.id}</b></span>
+            <button class="btn btn-sm btn-outline btn-warn" onclick="deleteRecipe('${r.id}')">Remove</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    $('rec-grid').innerHTML = `<div class="loading text-red">Error loading recipes: ${e.message}</div>`;
+  }
+}
+
+async function addRecipe() {
+  const body = {
+    name: val('r-name'),
+    category: val('r-category'),
+    cuisine: val('r-cuisine'),
+    prep: +val('r-prep'),
+    cook: +val('r-cook'),
+    servings: +val('r-servings'),
+    calories: +val('r-calories'),
+    difficulty: $('r-difficulty').value,
+    tags: val('r-tags').split(',').map(t=>t.trim()).filter(Boolean),
+    image_url: val('r-image-url')
+  };
+  await api('recipes', '', 'POST', body);
+  
+  $('r-name').value = '';
+  $('r-category').value = '';
+  $('r-cuisine').value = '';
+  $('r-prep').value = '';
+  $('r-cook').value = '';
+  $('r-servings').value = '';
+  $('r-calories').value = '';
+  $('r-tags').value = '';
+  $('r-image-url').value = '';
+  loadRecipes();
+}
+
+async function deleteRecipe(id) {
+  if (confirm('Delete this recipe?')) {
+    await api('recipes', '/' + id, 'DELETE');
+    loadRecipes();
+  }
+}
+
+// ── PANTRY ───────────────────────────────────
+async function loadPantry() {
+  try {
+    const data = await api('pantry');
+    const items = data.items || [];
+    $('pan-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Total Items</div><div class="stat-val">${data.total}</div></div>
+      <div class="stat"><div class="stat-label">Low Stock</div><div class="stat-val ${data.low_stock ? 'text-yellow' : ''}">${data.low_stock}</div></div>
+      <div class="stat"><div class="stat-label">Expiring Soon</div><div class="stat-val ${data.expiring_soon ? 'text-yellow' : ''}">${data.expiring_soon}</div></div>
+      <div class="stat"><div class="stat-label">Expired</div><div class="stat-val ${data.expired ? 'text-red' : ''}">${data.expired}</div></div>
+    `;
+    
+    $('pan-table').innerHTML = `
+      <thead>
+        <tr><th>Item</th><th>Category</th><th>Quantity</th><th>Expiry</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        ${items.length ? items.map(i => `
+          <tr>
+            <td><b>${i.name}</b></td>
+            <td>${i.category}</td>
+            <td>${i.quantity} ${i.unit}</td>
+            <td>${i.expiry}</td>
+            <td>
+              ${i.expired ? '<span class="badge badge-red">Expired</span>' : 
+                i.expiring_soon ? '<span class="badge badge-yellow">Expiring Soon</span>' : 
+                i.low_stock ? '<span class="badge badge-yellow">Low Stock</span>' : 
+                '<span class="badge badge-green">OK</span>'}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="adjustPantry('${i.id}', ${i.quantity - 100})">-100g</button>
+              <button class="btn btn-sm btn-outline" onclick="adjustPantry('${i.id}', ${i.quantity + 100})">+100g</button>
+              <button class="btn btn-sm btn-outline btn-warn" onclick="deletePantry('${i.id}')">✕</button>
+            </td>
+          </tr>
+        `).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Pantry is empty.</td></tr>`}
+      </tbody>
+    `;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function addPantryItem() {
+  const body = {
+    name: val('pi-name'),
+    category: val('pi-category'),
+    quantity: +val('pi-quantity'),
+    unit: val('pi-unit'),
+    min_quantity: +val('pi-min_quantity'),
+    expiry: val('pi-expiry')
+  };
+  await api('pantry', '', 'POST', body);
+  $('pi-name').value = '';
+  $('pi-category').value = '';
+  $('pi-quantity').value = '';
+  $('pi-unit').value = '';
+  $('pi-min_quantity').value = '';
+  loadPantry();
+}
+
+async function adjustPantry(id, newQty) {
+  if (newQty < 0) newQty = 0;
+  await api('pantry', '/' + id, 'PUT', { quantity: newQty });
+  loadPantry();
+}
+
+async function deletePantry(id) {
+  await api('pantry', '/' + id, 'DELETE');
+  loadPantry();
+}
+
+// ── PLANNER ──────────────────────────────────
+async function loadPlanner() {
+  try {
+    const data = await api('planner');
+    const plans = data.plans || [];
+    const days = Object.keys(data.by_date || {}).length;
+    $('plan-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Meals Planned</div><div class="stat-val">${data.total}</div></div>
+      <div class="stat"><div class="stat-label">Days Covered</div><div class="stat-val">${days}</div></div>
+      <div class="stat"><div class="stat-label">Total Calories</div><div class="stat-val">${data.total_calories_planned}</div></div>
+    `;
+    
+    $('plan-table').innerHTML = `
+      <thead>
+        <tr><th>Date</th><th>Meal Type</th><th>Recipe</th><th>Servings</th><th>Total Calories</th><th>Notes</th><th></th></tr>
+      </thead>
+      <tbody>
+        ${plans.length ? plans.map(p => `
+          <tr>
+            <td>${p.date}</td>
+            <td><span class="badge badge-green">${p.meal_type}</span></td>
+            <td><b>${p.recipe ? p.recipe.name : 'Unknown Recipe (' + p.recipe_id + ')'}</b></td>
+            <td>${p.servings}</td>
+            <td>${p.recipe ? (p.recipe.calories * p.servings) : '-'} kcal</td>
+            <td><span style="font-size:0.85rem;color:var(--text-muted)">${p.notes || '-'}</span></td>
+            <td><button class="btn btn-sm btn-outline btn-warn" onclick="deleteMeal('${p.id}')">Remove</button></td>
+          </tr>
+        `).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No meals planned.</td></tr>`}
+      </tbody>
+    `;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function addMeal() {
+  const body = {
+    recipe_id: val('mp-recipe_id'),
+    date: val('mp-date'),
+    meal_type: $('mp-meal_type').value,
+    servings: +val('mp-servings'),
+    notes: val('mp-notes')
+  };
+  await api('planner', '', 'POST', body);
+  $('mp-recipe_id').value = '';
+  $('mp-servings').value = '';
+  $('mp-notes').value = '';
+  loadPlanner();
+}
+
+async function deleteMeal(id) {
+  await api('planner', '/' + id, 'DELETE');
+  loadPlanner();
+}
+
+// ── SHOPPING ─────────────────────────────────
+async function loadShopping() {
+  try {
+    const data = await api('shopping');
+    const items = data.items || [];
+    $('shop-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Total Items</div><div class="stat-val">${data.total}</div></div>
+      <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val ${data.unchecked ? 'text-red' : ''}">${data.unchecked}</div></div>
+      <div class="stat"><div class="stat-label">Acquired</div><div class="stat-val ${data.checked ? 'text-green' : ''}">${data.checked}</div></div>
+      <div class="stat"><div class="stat-label">Categories</div><div class="stat-val">${Object.keys(data.by_category || {}).length}</div></div>
+    `;
+    
+    $('shop-table').innerHTML = `
+      <thead>
+        <tr><th>✓</th><th>Item</th><th>Category</th><th>Qty</th><th>Priority</th><th>For Recipe</th><th></th></tr>
+      </thead>
+      <tbody>
+        ${items.length ? items.map(i => `
+          <tr style="${i.checked ? 'opacity:0.55;' : ''}">
+            <td><input type="checkbox" ${i.checked ? 'checked' : ''} onchange="toggleShopCheck('${i.id}', this.checked)"></td>
+            <td>${i.checked ? '<s>' + i.item + '</s>' : '<b>' + i.item + '</b>'}</td>
+            <td>${i.category}</td>
+            <td>${i.quantity} ${i.unit}</td>
+            <td><span class="badge ${pri_colors[i.priority] || 'badge-grey'}">${i.priority}</span></td>
+            <td><span style="font-size:0.85rem;color:var(--text-muted)">${i.recipe ? i.recipe.name : '-'}</span></td>
+            <td><button class="btn btn-sm btn-outline btn-warn" onclick="deleteShop('${i.id}')">✕</button></td>
+          </tr>
+        `).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">Shopping list is empty.</td></tr>`}
+      </tbody>
+    `;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function addShopItem() {
+  const body = {
+    item: val('si-item'),
+    category: val('si-category'),
+    quantity: +val('si-quantity'),
+    unit: val('si-unit'),
+    priority: $('si-priority').value
+  };
+  await api('shopping', '', 'POST', body);
+  $('si-item').value = '';
+  $('si-category').value = '';
+  $('si-quantity').value = '';
+  $('si-unit').value = '';
+  loadShopping();
+}
+
+async function toggleShopCheck(id, isChecked) {
+  await api('shopping', '/' + id, 'PUT', { checked: isChecked });
+  loadShopping();
+}
+
+async function deleteShop(id) {
+  await api('shopping', '/' + id, 'DELETE');
+  loadShopping();
+}
+
+// ── NUTRITION ────────────────────────────────
+async function loadNutrition() {
+  try {
+    const data = await api('nutrition');
+    const logs = data.logs || [];
+    $('nut-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Logged Entries</div><div class="stat-val">${data.total_entries}</div></div>
+      <div class="stat"><div class="stat-label">Total Calories</div><div class="stat-val">${data.total_calories}</div></div>
+      <div class="stat"><div class="stat-label">Daily Average</div><div class="stat-val">${data.avg_calories_per_day}</div></div>
+    `;
+    
+    $('nut-table').innerHTML = `
+      <thead>
+        <tr><th>Date</th><th>Meal Type</th><th>Recipe</th><th>Servings</th><th>Total Calories</th><th>Notes</th><th></th></tr>
+      </thead>
+      <tbody>
+        ${logs.length ? logs.map(l => `
+          <tr>
+            <td>${l.date}</td>
+            <td><span class="badge badge-yellow">${l.meal_type}</span></td>
+            <td><b>${l.recipe_name}</b></td>
+            <td>${l.servings}</td>
+            <td>${l.calories} kcal</td>
+            <td><span style="font-size:0.85rem;color:var(--text-muted)">${l.notes || '-'}</span></td>
+            <td><button class="btn btn-sm btn-outline btn-warn" onclick="deleteNutLog('${l.id}')">✕</button></td>
+          </tr>
+        `).join('') : `<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No meal entries logged.</td></tr>`}
+      </tbody>
+    `;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function logMeal() {
+  const body = {
+    recipe_id: val('nl-recipe_id'),
+    date: val('nl-date'),
+    meal_type: $('nl-meal_type').value,
+    servings: +val('nl-servings'),
+    notes: ''
+  };
+  await api('nutrition', '', 'POST', body);
+  $('nl-recipe_id').value = '';
+  $('nl-servings').value = '';
+  loadNutrition();
+}
+
+async function deleteNutLog(id) {
+  await api('nutrition', '/' + id, 'DELETE');
+  loadNutrition();
+}
+
+// ── METRICS ──────────────────────────────────
+async function loadMetrics() {
+  try {
+    const data = await api('metrics');
+    
+    $('m-uptime').textContent = formatSeconds(data.uptime_seconds);
+    $('m-requests').textContent = data.requests.total;
+    
+    // Average Latency
+    const svcs = Object.keys(data.requests.by_service);
+    const avg = svcs.length ? Math.round(svcs.reduce((sum,s)=>sum+data.requests.by_service[s].avg_latency_ms, 0) / svcs.length) : 0;
+    $('m-avg-latency').textContent = `${avg} ms`;
+
+    // Record Counts
+    $('ds-recipes').textContent = data.datastores.recipes;
+    $('ds-pantry').textContent = data.datastores.pantry;
+    $('ds-planner').textContent = data.datastores.planner;
+    $('ds-shopping').textContent = data.datastores.shopping;
+    $('ds-nutrition').textContent = data.datastores.nutrition;
+
+    // CPU / Memory Stats
+    const system = data.system;
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    if (cpuHistory.length >= 10) {
+      cpuHistory.shift();
+      memHistory.shift();
+      chartLabels.shift();
+    }
+    cpuHistory.push(system.cpu_usage);
+    memHistory.push(system.memory_usage);
+    chartLabels.push(timeStr);
+    
+    updateCharts(svcs, data.requests.by_service);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function formatSeconds(sec) {
+  if (sec < 60) return `${sec}s`;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}m ${s}s`;
+}
+
+function updateCharts(services, serviceMetrics) {
+  // Chart 1: CPU & Memory
+  const ctx1 = $('cpuMemChart').getContext('2d');
+  if (!cpuMemChart) {
+    cpuMemChart = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [
+          { label: 'CPU Load (%)', data: cpuHistory, borderColor: '#d98e3b', backgroundColor: 'rgba(217,142,59,0.08)', fill: true, tension: 0.3 },
+          { label: 'RAM Load (%)', data: memHistory, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+          x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+        },
+        plugins: { legend: { labels: { color: '#f3f4f6' } } }
+      }
+    });
+  } else {
+    cpuMemChart.data.labels = chartLabels;
+    cpuMemChart.data.datasets[0].data = cpuHistory;
+    cpuMemChart.data.datasets[1].data = memHistory;
+    cpuMemChart.update('none');
+  }
+
+  // Chart 2: API hit volumes
+  const volumes = services.map(s => serviceMetrics[s].count);
+  const latencies = services.map(s => serviceMetrics[s].avg_latency_ms);
+
+  const ctx2 = $('apiChart').getContext('2d');
+  if (!apiChart) {
+    apiChart = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: services,
+        datasets: [
+          { label: 'API Calls', data: volumes, backgroundColor: 'rgba(74,222,128,0.55)', borderColor: '#4ade80', borderWidth: 1, yAxisID: 'y' },
+          { label: 'Avg Latency (ms)', data: latencies, backgroundColor: 'rgba(217,142,59,0.55)', borderColor: '#d98e3b', borderWidth: 1, yAxisID: 'y1' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { type: 'linear', position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+          y1: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#9ca3af' } }
+        },
+        plugins: { legend: { labels: { color: '#f3f4f6' } } }
+      }
+    });
+  } else {
+    apiChart.data.labels = services;
+    apiChart.data.datasets[0].data = volumes;
+    apiChart.data.datasets[1].data = latencies;
+    apiChart.update('none');
+  }
+}
+
+// Start live metrics polling
+setInterval(() => {
+  if (currentTab === 'metrics') loadMetrics();
+}, 2500);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "s1",
+    "car_id": "c1",
+    "type": "Oil Change",
+    "date": "2024-03-15",
+    "cost": 6500,
+    "mileage": 15000,
+    "notes": "Synthetic 5W-30",
+    "next_due_miles": 20000,
+    "_id": "s1"
+  },
+  {
+    "id": "s2",
+    "car_id": "c3",
+    "type": "Tyre Rotation",
+    "date": "2024-02-10",
+    "cost": 800,
+    "mileage": 25000,
+    "notes": "All 4 tyres rotated",
+    "next_due_miles": 30000,
+    "_id": "s2"
+  },
+  {
+    "id": "s3",
+    "car_id": "c5",
+    "type": "Brake Inspection",
+    "date": "2024-04-01",
+    "cost": 1500,
+    "mileage": 18000,
+    "notes": "Front pads 70% remaining",
+    "next_due_miles": 28000,
+    "_id": "s3"
+  }
+]

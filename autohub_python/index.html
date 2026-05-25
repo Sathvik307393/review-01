@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoHub — Automobile Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root {
+    --bg: #070a13; 
+    --surface: rgba(18, 22, 35, 0.75); 
+    --surface-solid: #111522;
+    --surface2: rgba(30, 39, 61, 0.7); 
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 87, 34, 0.4);
+    --accent: #ff5722; 
+    --accent-glow: rgba(255, 87, 34, 0.35);
+    --accent2: #ffb300; 
+    --text: #f1f5f9; 
+    --muted: #94a3b8;
+    --green: #10b981; 
+    --red: #ef4444; 
+    --blue: #3b82f6;
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { 
+    background: radial-gradient(circle at 50% 50%, #0d1527 0%, #04070f 100%); 
+    color: var(--text); 
+    font-family: 'Outfit', sans-serif; 
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  header { 
+    background: rgba(11, 15, 26, 0.85); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); 
+    padding: 0 2.5rem; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    height: 75px; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  }
+  
+  .logo { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 2.1rem; 
+    font-weight: 900; 
+    letter-spacing: .08em; 
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo span { color: var(--accent); }
+  
+  nav { display: flex; gap: .5rem; }
+  
+  nav button { 
+    background: none; 
+    border: none; 
+    color: var(--muted); 
+    font-family: 'Outfit', sans-serif; 
+    font-size: 0.95rem; 
+    font-weight: 600; 
+    padding: .6rem 1.2rem; 
+    cursor: pointer; 
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  nav button:hover { 
+    color: var(--text); 
+    background: rgba(255, 255, 255, 0.04);
+  }
+  nav button.active { 
+    color: #fff; 
+    background: linear-gradient(135deg, var(--accent) 0%, #e64a19 100%); 
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+  
+  .status-bar { 
+    background: linear-gradient(90deg, #05070c, var(--surface-solid)); 
+    border-bottom: 1px solid var(--border); 
+    padding: .5rem 2.5rem; 
+    font-size: .8rem; 
+    color: var(--muted); 
+    letter-spacing: .05em; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .status-bar span { color: var(--accent2); font-weight: 600; }
+  
+  main { max-width: 1300px; margin: 0 auto; padding: 2.5rem 2rem; }
+  
+  .page { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; } 
+  .page.active { display: block; opacity: 1; }
+  
+  h2 { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 2.4rem; 
+    font-weight: 900; 
+    letter-spacing: .04em; 
+    margin-bottom: 2rem; 
+    text-transform: uppercase; 
+    border-left: 4px solid var(--accent);
+    padding-left: 0.75rem;
+  }
+  h2 span { color: var(--accent); }
+  
+  /* Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.75rem; margin-bottom: 2rem; }
+  .card { 
+    background: var(--surface); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover { 
+    border-color: var(--border-hover); 
+    transform: translateY(-5px); 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 15px rgba(255, 87, 34, 0.12);
+  }
+  
+  .card-img-container {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: #090e18;
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .card:hover .card-img {
+    transform: scale(1.06);
+  }
+  .card-img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(17, 21, 34, 1) 0%, rgba(17, 21, 34, 0) 100%);
+  }
+  
+  .card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .card-title { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 1.35rem; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    letter-spacing: .04em; 
+    margin-bottom: .85rem; 
+    color: #fff;
+  }
+  
+  .card-meta { 
+    font-size: .88rem; 
+    color: var(--muted); 
+    margin-bottom: .4rem; 
+    display: flex;
+    justify-content: space-between;
+  }
+  .card-meta span { color: var(--text); font-weight: 500; }
+  
+  .card-value { 
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.8rem; 
+    font-weight: 800; 
+    color: var(--accent2); 
+    text-shadow: 0 0 10px rgba(255, 179, 0, 0.25);
+  }
+  
+  /* Badges */
+  .badge { 
+    display: inline-block; 
+    padding: .3rem .75rem; 
+    border-radius: 6px; 
+    font-size: .74rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: .08em; 
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .badge-green { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--green); text-shadow: 0 0 4px rgba(16,185,129,0.3); }
+  .badge-red { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--red); text-shadow: 0 0 4px rgba(239,68,68,0.3); }
+  .badge-yellow { background: rgba(255, 179, 0, 0.15); border: 1px solid rgba(255, 179, 0, 0.4); color: var(--accent2); text-shadow: 0 0 4px rgba(255,179,0,0.3); }
+  .badge-blue { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: var(--blue); text-shadow: 0 0 4px rgba(59,130,246,0.3); }
+  
+  /* Stats Cards */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+  .stat { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.5rem 1.25rem; 
+    text-align: center; 
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+  }
+  .stat:hover {
+    border-color: rgba(255, 179, 0, 0.35);
+    transform: translateY(-2px);
+  }
+  .stat-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: .6rem; font-weight: 600; }
+  .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 2.4rem; font-weight: 900; color: var(--accent2); text-shadow: 0 0 10px rgba(255, 179, 0, 0.2); }
+  
+  /* Forms */
+  .form-section { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.75rem; 
+    margin-top: 2rem; 
+    box-shadow: var(--card-shadow);
+  }
+  .form-section h3 { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 1.35rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: .06em; 
+    margin-bottom: 1.5rem; 
+    color: var(--accent2); 
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; }
+  
+  input, select { 
+    background: rgba(10, 14, 24, 0.85); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: .75rem 1rem; 
+    border-radius: 8px; 
+    font-size: .92rem; 
+    font-family: 'Outfit', sans-serif; 
+    width: 100%; 
+    transition: all .25s ease; 
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); background: rgba(16, 21, 35, 0.95); }
+  input::placeholder { color: #475569; }
+  label { font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .45rem; display: block; font-weight: 600; }
+  
+  /* Buttons */
+  .btn { 
+    background: linear-gradient(135deg, var(--accent) 0%, #d84315 100%); 
+    color: #fff; 
+    border: none; 
+    padding: .75rem 2rem; 
+    border-radius: 8px; 
+    font-family: 'Outfit', sans-serif; 
+    font-size: 0.95rem; 
+    font-weight: 700; 
+    letter-spacing: .05em; 
+    text-transform: uppercase; 
+    cursor: pointer; 
+    transition: all 0.25s ease; 
+    box-shadow: 0 4px 14px var(--accent-glow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn:hover { 
+    background: linear-gradient(135deg, #ff6e40 0%, #e64a19 100%); 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 18px rgba(255, 87, 34, 0.5); 
+  }
+  .btn:active { transform: translateY(0); }
+  .btn-sm { padding: .45rem 1rem; font-size: .8rem; border-radius: 6px; }
+  .btn-outline { background: none; color: var(--accent); border: 1px solid var(--accent); box-shadow: none; }
+  .btn-outline:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+  
+  /* Tables */
+  .table-wrap { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.75rem; 
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem; 
+    overflow-x: auto; 
+  }
+  
+  .table-wrap h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 1.25rem;
+    color: var(--accent2);
+  }
+  
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .9rem; }
+  th { 
+    background: rgba(30, 39, 61, 0.6); 
+    padding: 1rem 1.25rem; 
+    text-align: left; 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: .9rem; 
+    font-weight: 700; 
+    letter-spacing: .1em; 
+    text-transform: uppercase; 
+    color: var(--muted); 
+    border-bottom: 1px solid var(--border); 
+  }
+  th:first-child { border-top-left-radius: 8px; }
+  th:last-child { border-top-right-radius: 8px; }
+  
+  td { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.03); }
+  
+  .loading { color: var(--muted); font-style: italic; padding: 2.5rem; text-align: center; font-size: 1rem; }
+  .err { color: var(--red); padding: .75rem; background: rgba(239,68,68,.12); border-radius: 6px; margin-top: .75rem; font-size: .88rem; border: 1px solid rgba(239,68,68,0.25); }
+  
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(4, 7, 15, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Auto<span>Hub</span></div>
+  <nav>
+    <button class="active" onclick="navigate('inventory')">Inventory</button>
+    <button onclick="navigate('booking')">Bookings</button>
+    <button onclick="navigate('payment')">Payments</button>
+    <button onclick="navigate('service')">Service</button>
+    <button onclick="navigate('valuation')">Valuation</button>
+    <button onclick="navigate('fuel')">Fuel</button>
+    <button onclick="navigate('insurance')">Insurance</button>
+    <button onclick="navigate('metrics')">Metrics</button>
+  </nav>
+  
+  <div style="display:flex; align-items:center; gap:1.25rem;">
+    <div id="user-profile" style="font-size:0.92rem; font-weight:600; color:var(--accent2); display:none;">Welcome, <span id="profile-name"></span></div>
+    <button id="btn-logout" class="btn btn-sm btn-outline" style="display:none;" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="status-bar">
+  <div>AutoHub Dashboard &nbsp;|&nbsp; <span style="color:var(--accent2); font-weight:600;">9 Active Microservices</span> &nbsp;|&nbsp; DNS Domain Routing</div>
+  <div id="quick-perf-indicator">Server Health: <span style="color:var(--green)">Online</span></div>
+</div>
+
+<!-- Auth Modal Overlay -->
+<div id="auth-overlay" class="modal-backdrop" style="display:none;">
+  <div class="form-section" style="width:420px; border:1px solid var(--border-hover); background:rgba(18, 22, 35, 0.95); box-shadow:0 20px 50px rgba(0,0,0,0.8); margin-top:0;">
+    <div class="logo" style="text-align:center; margin-bottom:1.5rem; font-size:2.5rem; display:block;">Auto<span>Hub</span></div>
+    <div id="auth-title" style="font-family:'Barlow Condensed'; font-size:1.8rem; font-weight:800; text-transform:uppercase; text-align:center; margin-bottom:1.5rem; color:#fff;">Account Sign-In</div>
+    
+    <div id="login-form">
+      <div style="margin-bottom:1rem;">
+        <label>Username</label>
+        <input id="auth-username" placeholder="Enter username">
+      </div>
+      <div style="margin-bottom:1.25rem;">
+        <label>Password</label>
+        <input id="auth-password" type="password" placeholder="Enter password">
+      </div>
+      <button class="btn" style="width:100%;" onclick="login()">Sign In</button>
+      <div style="text-align:center; margin-top:1.25rem; font-size:0.85rem; color:var(--muted);">
+        Don't have an account? <a href="#" onclick="toggleAuthMode(true)" style="color:var(--accent); text-decoration:none; font-weight:600;">Register Now</a>
+      </div>
+    </div>
+    
+    <div id="register-form" style="display:none;">
+      <div style="margin-bottom:1rem;">
+        <label>Username</label>
+        <input id="reg-username" placeholder="Choose username">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label>Email Address</label>
+        <input id="reg-email" type="email" placeholder="Enter email">
+      </div>
+      <div style="margin-bottom:1.25rem;">
+        <label>Password</label>
+        <input id="reg-password" type="password" placeholder="Choose password">
+      </div>
+      <button class="btn" style="width:100%;" onclick="register()">Create Account</button>
+      <div style="text-align:center; margin-top:1.25rem; font-size:0.85rem; color:var(--muted);">
+        Already have an account? <a href="#" onclick="toggleAuthMode(false)" style="color:var(--accent); text-decoration:none; font-weight:600;">Sign In</a>
+      </div>
+    </div>
+    
+    <div id="auth-err" class="err" style="display:none; margin-top:1.25rem;"></div>
+  </div>
+</div>
+
+<!-- Booking Creation Modal -->
+<div id="booking-modal" class="modal-backdrop" style="display:none;">
+  <div class="form-section" style="width:480px; background:rgba(18, 22, 35, 0.95); border:1px solid var(--border-hover); margin-top:0;">
+    <h3 id="booking-modal-title">Book Vehicle</h3>
+    <input type="hidden" id="book-car-id">
+    
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom: 0.50rem;">
+        <span style="font-size:0.85rem; color:var(--muted);">Selected Car:</span>
+        <strong id="book-car-name" style="color:#fff;">Car Details</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:0.85rem; color:var(--muted);">Daily Rate:</span>
+        <strong id="book-car-rate" style="color:var(--accent2);">₹0/day</strong>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div>
+        <label>Start Date</label>
+        <input type="date" id="book-start-date" onchange="calculateBookingCost()">
+      </div>
+      <div>
+        <label>End Date</label>
+        <input type="date" id="book-end-date" onchange="calculateBookingCost()">
+      </div>
+    </div>
+    
+    <div style="background:rgba(0,0,0,0.25); padding:1rem; border-radius:8px; margin: 1.25rem 0; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted)">Estimated Cost</div>
+        <div id="book-total-days" style="font-size:0.82rem; color:var(--muted)">0 days</div>
+      </div>
+      <div id="book-total-cost" style="font-size:1.6rem; font-weight:800; color:var(--green)">₹0</div>
+    </div>
+    
+    <div style="display:flex; gap:1rem; justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeBookingModal()">Cancel</button>
+      <button class="btn" onclick="submitBooking()">Confirm Reservation</button>
+    </div>
+    <div id="booking-err" class="err" style="display:none; margin-top:1.25rem;"></div>
+  </div>
+</div>
+
+<!-- Payment Checkout Modal -->
+<div id="payment-modal" class="modal-backdrop" style="display:none;">
+  <div class="form-section" style="width:450px; background:rgba(18, 22, 35, 0.95); border:1px solid var(--border-hover); margin-top:0;">
+    <h3>Invoice Payment</h3>
+    <input type="hidden" id="pay-booking-id">
+    
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom: 0.50rem;">
+        <span style="font-size:0.85rem; color:var(--muted);">Reservation ID:</span>
+        <code id="pay-booking-code" style="color:var(--accent);">#b1</code>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 0.50rem;">
+        <span style="font-size:0.85rem; color:var(--muted);">Vehicle:</span>
+        <strong id="pay-car-name" style="color:#fff;">Toyota Camry</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+        <span style="font-size:0.85rem; color:var(--muted);">Amount Due:</span>
+        <strong id="pay-amount" style="color:var(--accent2); font-size:1.4rem;">₹0</strong>
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 1.25rem;">
+      <label>Payment Method</label>
+      <select id="pay-method">
+        <option>UPI / GPay / PhonePe</option>
+        <option>Credit Card</option>
+        <option>Debit Card</option>
+        <option>Netbanking</option>
+      </select>
+    </div>
+    
+    <div style="display:flex; gap:1rem; justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closePaymentModal()">Cancel</button>
+      <button class="btn" onclick="submitPayment()">Complete Payment</button>
+    </div>
+    <div id="payment-err" class="err" style="display:none; margin-top:1.25rem;"></div>
+  </div>
+</div>
+
+<main>
+  <!-- Inventory Page -->
+  <div class="page active" id="page-inventory">
+    <h2>Car <span>Inventory</span></h2>
+    <div class="stats-row" id="inv-stats"></div>
+    <div class="grid" id="inv-cards"><div class="loading">Loading inventory…</div></div>
+    
+    <div class="form-section">
+      <h3>+ Add New Fleet Vehicle</h3>
+      <div class="form-row">
+        <div><label>Make</label><input id="i-make" placeholder="e.g. Tata"></div>
+        <div><label>Model</label><input id="i-model" placeholder="e.g. Nexon EV"></div>
+        <div><label>Year</label><input id="i-year" type="number" placeholder="e.g. 2023"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Color</label><input id="i-color" placeholder="e.g. Empowered Oxide"></div>
+        <div><label>Mileage (km)</label><input id="i-mileage" type="number" placeholder="e.g. 15000"></div>
+        <div><label>Original Price (₹)</label><input id="i-price" type="number" placeholder="e.g. 1750000"></div>
+      </div>
+      <div class="form-row">
+        <div style="grid-column: span 3;"><label>Image URL (Optional)</label><input id="i-image_url" placeholder="https://images.unsplash.com/photo-..."></div>
+      </div>
+      <button class="btn" onclick="addCar()">Add to Fleet</button>
+      <div id="inv-err" class="err" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Booking Page -->
+  <div class="page" id="page-booking">
+    <h2>My <span>Reservations</span></h2>
+    <div class="stats-row" id="book-stats"></div>
+    <div class="table-wrap">
+      <h3>Active Bookings</h3>
+      <table id="book-table"><tr><td class="loading">Loading reservations…</td></tr></table>
+    </div>
+  </div>
+
+  <!-- Payment Page -->
+  <div class="page" id="page-payment">
+    <h2>Payment <span>Transactions</span></h2>
+    <div class="stats-row" id="pay-stats"></div>
+    <div class="table-wrap">
+      <h3>Transaction History</h3>
+      <table id="pay-table"><tr><td class="loading">Loading transactions…</td></tr></table>
+    </div>
+  </div>
+
+  <!-- Service Page -->
+  <div class="page" id="page-service">
+    <h2>Service &amp; <span>Maintenance Logs</span></h2>
+    <div class="stats-row" id="svc-stats"></div>
+    <div class="table-wrap">
+      <h3>Logged Operations</h3>
+      <table id="svc-table"><tr><td class="loading">Loading records…</td></tr></table>
+    </div>
+    
+    <div class="form-section">
+      <h3>+ Log Maintenance Operation</h3>
+      <div class="form-row">
+        <div><label>Car ID</label><input id="s-car_id" placeholder="e.g. c1"></div>
+        <div><label>Service Type</label><input id="s-type" placeholder="e.g. Oil Change"></div>
+        <div><label>Operation Cost (₹)</label><input id="s-cost" type="number" placeholder="e.g. 6500"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Odometer Mileage (km)</label><input id="s-mileage" type="number" placeholder="e.g. 32000"></div>
+        <div><label>Next Due Odometer (km)</label><input id="s-next_due_miles" type="number" placeholder="e.g. 37000"></div>
+        <div><label>Service Notes</label><input id="s-notes" placeholder="Synthetic 5W-30, Filter replaced..."></div>
+      </div>
+      <button class="btn" onclick="addService()">Log Service Record</button>
+    </div>
+  </div>
+
+  <!-- Valuation Page -->
+  <div class="page" id="page-valuation">
+    <h2>Fleet <span>Valuations</span></h2>
+    <div class="stats-row" id="val-stats"></div>
+    <div class="grid" id="val-cards"><div class="loading">Computing valuations…</div></div>
+  </div>
+
+  <!-- Fuel Page -->
+  <div class="page" id="page-fuel">
+    <h2>Fuel <span>Tracker &amp; Analytics</span></h2>
+    <div class="stats-row" id="fuel-stats"></div>
+    <div class="table-wrap">
+      <h3>Fill-up Logs</h3>
+      <table id="fuel-table"><tr><td class="loading">Loading fuel logs…</td></tr></table>
+    </div>
+    
+    <div class="form-section">
+      <h3>+ Log Fuel Fill-up</h3>
+      <div class="form-row">
+        <div><label>Car ID</label><input id="f-car_id" placeholder="e.g. c1"></div>
+        <div><label>Litres Pumped</label><input id="f-litres" type="number" step="0.1" placeholder="e.g. 45.0"></div>
+        <div><label>Cost/Litre (₹)</label><input id="f-cost_per_litre" type="number" step="0.01" placeholder="e.g. 102.50"></div>
+        <div><label>Current Odometer (km)</label><input id="f-odometer" type="number" placeholder="e.g. 32100"></div>
+      </div>
+      <button class="btn" onclick="addFuel()">Log Fuel Entry</button>
+    </div>
+  </div>
+
+  <!-- Insurance Page -->
+  <div class="page" id="page-insurance">
+    <h2>Insurance <span>Manager</span></h2>
+    <div class="stats-row" id="ins-stats"></div>
+    <div class="grid" id="ins-cards"><div class="loading">Loading policies…</div></div>
+    
+    <div class="form-section">
+      <h3>+ Attach New Policy</h3>
+      <div class="form-row">
+        <div><label>Car ID</label><input id="p-car_id" placeholder="e.g. c1"></div>
+        <div><label>Provider</label><input id="p-provider" placeholder="e.g. SafeDrive Co."></div>
+        <div><label>Policy Number</label><input id="p-policy_no" placeholder="e.g. SD-2024-001"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Coverage Type</label>
+          <select id="p-type"><option>Comprehensive</option><option>Third Party</option><option>Third Party Fire &amp; Theft</option></select>
+        </div>
+        <div><label>Annual Premium (₹)</label><input id="p-premium" type="number" placeholder="e.g. 32000"></div>
+        <div><label>Start Date</label><input id="p-start" type="date"></div>
+        <div><label>End Date</label><input id="p-end" type="date"></div>
+      </div>
+      <button class="btn" onclick="addPolicy()">Attach Policy</button>
+    </div>
+  </div>
+
+  <!-- Metrics Page -->
+  <div class="page" id="page-metrics">
+    <h2>Server <span>Performance Metrics</span></h2>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Server Uptime</div><div class="stat-val" id="met-uptime">0s</div></div>
+      <div class="stat"><div class="stat-label">Total API Requests</div><div class="stat-val" id="met-requests">0</div></div>
+      <div class="stat"><div class="stat-label">Active CPU Load</div><div class="stat-val" style="color:var(--accent)" id="met-cpu">0.0%</div></div>
+      <div class="stat"><div class="stat-label">RAM Load</div><div class="stat-val" style="color:var(--blue)" id="met-mem">0.0%</div></div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem; margin-bottom: 2.5rem;">
+      <div class="form-section" style="margin-top:0;">
+        <h3>System Load Trends (Real-time)</h3>
+        <div style="position: relative; height: 320px; width: 100%;">
+          <canvas id="chart-system"></canvas>
+        </div>
+      </div>
+      <div class="form-section" style="margin-top:0;">
+        <h3>API Service Volume &amp; Response Latency</h3>
+        <div style="position: relative; height: 320px; width: 100%;">
+          <canvas id="chart-endpoints"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-wrap">
+      <h3>Active System Resources &amp; Response Profiles</h3>
+      <table id="met-table">
+        <thead>
+          <tr>
+            <th>Service / Endpoint</th>
+            <th>Type</th>
+            <th>Total Hits</th>
+            <th>Average Response Latency</th>
+            <th>Service Status</th>
+          </tr>
+        </thead>
+        <tbody id="met-table-body">
+          <tr><td colspan="5" class="loading">Loading performance metrics…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const val = id => $(id)?.value || '';
+
+const statusBadge = s => { 
+  const map = {available:'badge-green', sold:'badge-red', reserved:'badge-yellow', pending:'badge-yellow', confirmed:'badge-blue', paid:'badge-green', cancelled:'badge-red'}; 
+  return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`; 
+};
+
+// Port mappings for localhost development
+const LOCAL_PORTS = {
+  'auth': 5001,
+  'inventory': 5002,
+  'booking': 5003,
+  'service': 5004,
+  'payment': 5005,
+  'valuation': 5006,
+  'fuel': 5007,
+  'insurance': 5008,
+  'metrics': 5009
+};
+
+function getServiceUrl(service) {
+  const host = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return `${protocol}//${host}:${LOCAL_PORTS[service]}/api/${service}`;
+  } else {
+    // Domain-based routing in production: e.g., auth.yourdomain.com, inventory.yourdomain.com
+    const parts = host.split('.');
+    const parentDomain = parts.length > 2 ? parts.slice(1).join('.') : host;
+    return `${protocol}//${service}.${parentDomain}/api/${service}`;
+  }
+}
+
+let currentTab = 'inventory';
+let systemCpuHistory = [];
+let systemMemHistory = [];
+let timeLabels = [];
+const MAX_HISTORY = 12;
+
+let systemChart = null;
+let endpointChart = null;
+
+// Auth headers helper
+function getHeaders() {
+  const token = localStorage.getItem('autohub_token');
+  const headers = {'Content-Type':'application/json'};
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return headers;
+}
+
+// Global API fetcher routing to proper sub-ports or subdomains
+async function api(path, method='GET', body=null) {
+  const parts = path.split('/').filter(p => p);
+  const service = parts[0]; 
+  
+  const serviceUrl = getServiceUrl(service);
+  const relativePath = '/' + parts.slice(1).join('/');
+  const finalUrl = serviceUrl + (relativePath === '/' ? '' : relativePath);
+
+  const opts = { method, headers: getHeaders() };
+  if (body) opts.body = JSON.stringify(body);
+  
+  const r = await fetch(finalUrl, opts);
+  if (r.status === 401) {
+    localStorage.removeItem('autohub_token');
+    localStorage.removeItem('autohub_username');
+    checkAuth();
+    throw new Error("Unauthorised");
+  }
+  return r.json();
+}
+
+function checkAuth() {
+  const token = localStorage.getItem('autohub_token');
+  const username = localStorage.getItem('autohub_username');
+  if (!token) {
+    $('auth-overlay').style.display = 'flex';
+    $('user-profile').style.display = 'none';
+    $('btn-logout').style.display = 'none';
+  } else {
+    $('auth-overlay').style.display = 'none';
+    $('profile-name').textContent = username;
+    $('user-profile').style.display = 'block';
+    $('btn-logout').style.display = 'block';
+    navigate(currentTab);
+  }
+}
+
+function toggleAuthMode(isRegister) {
+  if (isRegister) {
+    $('login-form').style.display = 'none';
+    $('register-form').style.display = 'block';
+    $('auth-title').textContent = 'Account Registration';
+  } else {
+    $('login-form').style.display = 'block';
+    $('register-form').style.display = 'none';
+    $('auth-title').textContent = 'Account Sign-In';
+  }
+  $('auth-err').style.display = 'none';
+}
+
+async function login() {
+  const username = val('auth-username');
+  const password = val('auth-password');
+  $('auth-err').style.display = 'none';
+  try {
+    const authUrl = getServiceUrl('auth') + '/login';
+    const res = await fetch(authUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('autohub_token', data.token);
+      localStorage.setItem('autohub_username', data.username);
+      checkAuth();
+    } else {
+      $('auth-err').textContent = data.error || 'Login failed.';
+      $('auth-err').style.display = 'block';
+    }
+  } catch(e) {
+    $('auth-err').textContent = 'Network error connecting to Auth Service.';
+    $('auth-err').style.display = 'block';
+  }
+}
+
+async function register() {
+  const username = val('reg-username');
+  const email = val('reg-email');
+  const password = val('reg-password');
+  $('auth-err').style.display = 'none';
+  try {
+    const authUrl = getServiceUrl('auth') + '/register';
+    const res = await fetch(authUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, email, password})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      toggleAuthMode(false);
+      $('auth-username').value = username;
+      $('auth-err').textContent = 'Account created. Please log in.';
+      $('auth-err').style.display = 'block';
+      $('auth-err').className = 'badge badge-green'; 
+      setTimeout(() => $('auth-err').className = 'err', 3000);
+    } else {
+      $('auth-err').textContent = data.error || 'Registration failed.';
+      $('auth-err').style.display = 'block';
+    }
+  } catch(e) {
+    $('auth-err').textContent = 'Network error connecting to Auth Service.';
+    $('auth-err').style.display = 'block';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('autohub_token');
+  localStorage.removeItem('autohub_username');
+  checkAuth();
+}
+
+function navigate(page) {
+  currentTab = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  $(`page-${page}`).classList.add('active');
+  
+  const pages = ['inventory','booking','payment','service','valuation','fuel','insurance','metrics'];
+  const idx = pages.indexOf(page);
+  if (idx !== -1) {
+    document.querySelectorAll('nav button')[idx].classList.add('active');
+  }
+  
+  if (loaders[page]) {
+    loaders[page]();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Inventory Service Handling
+// ─────────────────────────────────────────────
+async function loadInventory() {
+  const data = await api('/inventory');
+  const cars = data.cars || [];
+  const avail = cars.filter(c=>c.status==='available').length;
+  $('inv-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Total Fleet</div><div class="stat-val">${cars.length}</div></div>
+    <div class="stat"><div class="stat-label">Available</div><div class="stat-val" style="color:var(--green)">${avail}</div></div>
+    <div class="stat"><div class="stat-label">Sold</div><div class="stat-val" style="color:var(--red)">${cars.filter(c=>c.status==='sold').length}</div></div>
+    <div class="stat"><div class="stat-label">Reserved</div><div class="stat-val" style="color:var(--accent2)">${cars.filter(c=>c.status==='reserved').length}</div></div>
+    <div class="stat"><div class="stat-label">Portfolio Value</div><div class="stat-val">₹${(cars.reduce((a,c)=>a+c.price,0)/100000).toFixed(1)} Lakhs</div></div>`;
+    
+  $('inv-cards').innerHTML = cars.map(c => `
+    <div class="card">
+      <div class="card-img-container">
+        <img class="card-img" src="${c.image_url || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'}" alt="${c.make} ${c.model}" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'">
+        <div class="card-img-overlay"></div>
+        <div style="position: absolute; top: 15px; right: 15px; z-index: 2;">
+          ${statusBadge(c.status)}
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-title">${c.year} ${c.make} ${c.model}</div>
+        <div class="card-meta">Color: <span>${c.color}</span></div>
+        <div class="card-meta">Odometer: <span>${c.mileage.toLocaleString()} km</span></div>
+        <div class="card-meta">Asset ID: <code style="color:var(--accent)">${c.id}</code></div>
+        <div style="margin-top: auto; padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+          <div class="card-value">₹${c.price.toLocaleString('en-IN')}</div>
+          <div style="display:flex; gap:0.5rem;">
+            ${c.status === 'available' ? `<button class="btn btn-sm" onclick="openBookingModal('${c.id}', '${c.make} ${c.model}', ${c.price})">Book</button>` : ''}
+            <button class="btn btn-sm btn-outline" onclick="deleteCar('${c.id}')">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function addCar() {
+  const body = {
+    make: val('i-make'), 
+    model: val('i-model'), 
+    year: +val('i-year'), 
+    color: val('i-color'), 
+    mileage: +val('i-mileage'), 
+    price: +val('i-price'),
+    image_url: val('i-image_url')
+  };
+  if (!body.make || !body.model) {
+    $('inv-err').textContent = 'Make and Model required.'; 
+    $('inv-err').style.display = 'block'; 
+    return; 
+  }
+  $('inv-err').style.display = 'none';
+  await api('/inventory', 'POST', body);
+  
+  $('i-make').value = '';
+  $('i-model').value = '';
+  $('i-year').value = '';
+  $('i-color').value = '';
+  $('i-mileage').value = '';
+  $('i-price').value = '';
+  $('i-image_url').value = '';
+  loadInventory();
+}
+
+async function deleteCar(id) { 
+  await api('/inventory/'+id, 'DELETE'); 
+  loadInventory(); 
+}
+
+// ─────────────────────────────────────────────
+//  Booking Service Handling
+// ─────────────────────────────────────────────
+function openBookingModal(carId, carName, carPrice) {
+  $('book-car-id').value = carId;
+  $('book-car-name').textContent = carName;
+  
+  const dailyRate = Math.round(carPrice * 0.002);
+  $('book-car-rate').textContent = `₹${dailyRate.toLocaleString('en-IN')}/day`;
+  $('book-car-rate').dataset.rate = dailyRate;
+  
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  $('book-start-date').value = today;
+  $('book-end-date').value = tomorrow;
+  
+  calculateBookingCost();
+  $('booking-err').style.display = 'none';
+  $('booking-modal').style.display = 'flex';
+}
+
+function calculateBookingCost() {
+  const rate = +$('book-car-rate').dataset.rate;
+  const startStr = $('book-start-date').value;
+  const endStr = $('book-end-date').value;
+  
+  if (!startStr || !endStr) return;
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  
+  const diffTime = end - start;
+  const days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  
+  $('book-total-days').textContent = `${days} day${days > 1 ? 's' : ''}`;
+  const total = days * rate;
+  $('book-total-cost').textContent = `₹${total.toLocaleString('en-IN')}`;
+}
+
+function closeBookingModal() {
+  $('booking-modal').style.display = 'none';
+}
+
+async function submitBooking() {
+  const body = {
+    car_id: val('book-car-id'),
+    start_date: val('book-start-date'),
+    end_date: val('book-end-date')
+  };
+  
+  try {
+    await api('/booking', 'POST', body);
+    closeBookingModal();
+    navigate('booking');
+  } catch(e) {
+    $('booking-err').textContent = e.message || 'Error creating booking.';
+    $('booking-err').style.display = 'block';
+  }
+}
+
+async function loadBookings() {
+  const data = await api('/booking');
+  const list = data.bookings || [];
+  
+  const unpaid = list.filter(b => b.status === 'confirmed').length;
+  $('book-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">My Reservations</div><div class="stat-val">${list.length}</div></div>
+    <div class="stat"><div class="stat-label">Pending Payments</div><div class="stat-val" style="color:var(--accent2)">${unpaid}</div></div>
+    <div class="stat"><div class="stat-label">Completed Trips</div><div class="stat-val" style="color:var(--green)">${list.filter(b => b.status === 'paid').length}</div></div>
+  `;
+  
+  $('book-table').innerHTML = `<thead><tr><th>Booking ID</th><th>Vehicle</th><th>Dates</th><th>Duration</th><th>Total Cost</th><th>Status</th><th>Actions</th></tr></thead><tbody>`
+    + (list.length ? list.map(b => {
+        const start = new Date(b.start_date);
+        const end = new Date(b.end_date);
+        const days = Math.max(1, Math.ceil((end - start)/(1000*60*60*24)));
+        return `<tr>
+          <td><code style="color:var(--muted)">${b.id}</code></td>
+          <td><strong>${b.car?.make||''} ${b.car?.model||''}</strong></td>
+          <td>${b.start_date} to ${b.end_date}</td>
+          <td>${days} day${days > 1 ? 's' : ''}</td>
+          <td style="color:var(--green); font-weight:700;">₹${b.total_cost.toLocaleString('en-IN')}</td>
+          <td>${statusBadge(b.status)}</td>
+          <td>
+            ${b.status === 'confirmed' ? `<button class="btn btn-sm btn-outline" style="color:var(--accent2); border-color:var(--accent2);" onclick="openPaymentModal('${b.id}', '${b.car?.make||''} ${b.car?.model||''}', ${b.total_cost})">Pay Now</button>` : '-'}
+          </td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:2rem;">No active reservations found. Click "Book" on any vehicle in the Inventory.</td></tr>`) + '</tbody>';
+}
+
+// ─────────────────────────────────────────────
+//  Payment Service Handling
+// ─────────────────────────────────────────────
+function openPaymentModal(bookingId, carName, totalCost) {
+  $('pay-booking-id').value = bookingId;
+  $('pay-booking-code').textContent = '#' + bookingId;
+  $('pay-car-name').textContent = carName;
+  $('pay-amount').textContent = `₹${totalCost.toLocaleString('en-IN')}`;
+  $('pay-amount').dataset.val = totalCost;
+  
+  $('payment-err').style.display = 'none';
+  $('payment-modal').style.display = 'flex';
+}
+
+function closePaymentModal() {
+  $('payment-modal').style.display = 'none';
+}
+
+async function submitPayment() {
+  const body = {
+    booking_id: val('pay-booking-id'),
+    amount: +$('pay-amount').dataset.val,
+    payment_method: val('pay-method')
+  };
+  
+  try {
+    await api('/payment', 'POST', body);
+    closePaymentModal();
+    navigate('payment');
+  } catch(e) {
+    $('payment-err').textContent = e.message || 'Payment processing failed.';
+    $('payment-err').style.display = 'block';
+  }
+}
+
+async function loadPayments() {
+  const data = await api('/payment');
+  const list = data.transactions || [];
+  const totalPaid = list.reduce((a, t) => a + t.amount, 0);
+  
+  $('pay-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Transactions</div><div class="stat-val">${list.length}</div></div>
+    <div class="stat"><div class="stat-label">Total Outlay</div><div class="stat-val" style="color:var(--green)">₹${totalPaid.toLocaleString('en-IN')}</div></div>
+  `;
+  
+  $('pay-table').innerHTML = `<thead><tr><th>Transaction ID</th><th>Reservation ID</th><th>Date/Time</th><th>Method</th><th>Amount</th><th>Status</th></tr></thead><tbody>`
+    + (list.length ? list.map(t => `<tr>
+        <td><code style="color:var(--muted)">${t.id}</code></td>
+        <td><code style="color:var(--accent)">${t.booking_id || t.service_id || '-'}</code></td>
+        <td>${new Date(t.timestamp * 1000).toLocaleString()}</td>
+        <td>${t.payment_method}</td>
+        <td style="color:var(--green); font-weight:700;">₹${t.amount.toLocaleString('en-IN')}</td>
+        <td>${statusBadge(t.status)}</td>
+      </tr>`).join('') : `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:2rem;">No transaction receipts available.</td></tr>`) + '</tbody>';
+}
+
+// ─────────────────────────────────────────────
+//  Service Records Handling
+// ─────────────────────────────────────────────
+async function loadService() {
+  const data = await api('/service');
+  const recs = data.records || [];
+  $('svc-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Total Tasks</div><div class="stat-val">${recs.length}</div></div>
+    <div class="stat"><div class="stat-label">Fleet Spend</div><div class="stat-val">₹${data.total_cost.toLocaleString('en-IN')}</div></div>
+    <div class="stat"><div class="stat-label">Avg Repair cost</div><div class="stat-val">₹${recs.length ? Math.round(data.total_cost/recs.length).toLocaleString('en-IN') : 0}</div></div>`;
+  
+  $('svc-table').innerHTML = `<thead><tr><th>ID</th><th>Car Model</th><th>Maintenance Type</th><th>Operation Date</th><th>Cost</th><th>Odometer</th><th>Next Due</th><th>Notes</th><th></th></tr></thead><tbody>`
+    + (recs.length ? recs.map(r=>`<tr>
+      <td><code style="color:var(--muted)">${r.id}</code></td>
+      <td><strong>${r.car?.make||''} ${r.car?.model||''}</strong> <small style="color:var(--muted)">(${r.car_id})</small></td>
+      <td><span class="badge badge-blue">${r.type}</span></td>
+      <td>${r.date}</td>
+      <td style="color:var(--green)">₹${r.cost.toLocaleString('en-IN')}</td>
+      <td>${r.mileage ? r.mileage.toLocaleString() + ' km' : '-'}</td>
+      <td>${r.next_due_miles ? r.next_due_miles.toLocaleString() + ' km' : '-'}</td>
+      <td style="color:var(--muted); font-size:.85rem; max-width: 200px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${r.notes||''}</td>
+      <td><button class="btn btn-sm btn-outline" onclick="deleteService('${r.id}')">Del</button></td>
+    </tr>`).join('') : `<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:2rem;">No service operations logged yet.</td></tr>`) + '</tbody>';
+}
+
+async function addService() {
+  const body = {
+    car_id: val('s-car_id'), 
+    type: val('s-type'), 
+    cost: +val('s-cost'), 
+    mileage: +val('s-mileage'), 
+    next_due_miles: +val('s-next_due_miles'), 
+    notes: val('s-notes')
+  };
+  await api('/service', 'POST', body); 
+  
+  $('s-car_id').value = '';
+  $('s-type').value = '';
+  $('s-cost').value = '';
+  $('s-mileage').value = '';
+  $('s-next_due_miles').value = '';
+  $('s-notes').value = '';
+  loadService();
+}
+
+async function deleteService(id) { 
+  await api('/service/'+id, 'DELETE'); 
+  loadService(); 
+}
+
+// ─────────────────────────────────────────────
+//  Car Valuations Handling
+// ─────────────────────────────────────────────
+async function loadValuation() {
+  const data = await api('/valuation');
+  const vals = data.valuations || [];
+  const total = vals.reduce((a,v)=>a+v.market_value, 0);
+  $('val-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Active Appraisals</div><div class="stat-val">${vals.length}</div></div>
+    <div class="stat"><div class="stat-label">Market Evaluation</div><div class="stat-val">₹${(total/100000).toFixed(1)} Lakhs</div></div>
+    <div class="stat"><div class="stat-label">Avg Depreciation</div><div class="stat-val">${vals.length ? Math.round(vals.reduce((a,v)=>a+v.depreciation_pct, 0)/vals.length) : 0}%</div></div>`;
+    
+  $('val-cards').innerHTML = vals.map(v=>`
+    <div class="card">
+      <div class="card-img-container">
+        <img class="card-img" src="${v.image_url || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'}" alt="${v.make} ${v.model}" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'">
+        <div class="card-img-overlay"></div>
+      </div>
+      <div class="card-content">
+        <div class="card-title">${v.year} ${v.make} ${v.model}</div>
+        <div class="card-meta">Original Price: <span>₹${v.original_price.toLocaleString('en-IN')}</span></div>
+        <div class="card-meta">Depreciation Run: <span>${v.age_years} yr</span> · Odometer: <span>${v.mileage.toLocaleString()} km</span></div>
+        
+        <div style="margin: 1.25rem 0 .4rem; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)">Estimated Market Value</div>
+        <div class="card-value" style="font-size:1.9rem; margin-bottom:.5rem;">₹${v.market_value.toLocaleString('en-IN')}</div>
+        <div style="margin-top: auto;"><span class="badge badge-red">-${v.depreciation_pct}% deprecation rate</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+//  Fuel Tracker Handling
+// ─────────────────────────────────────────────
+async function loadFuel() {
+  const data = await api('/fuel');
+  const logs = data.logs || [];
+  const totalL = logs.reduce((a,l)=>a+l.litres, 0);
+  const totalCost = logs.reduce((a,l)=>a+l.total_cost, 0);
+  $('fuel-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Logged Refuels</div><div class="stat-val">${logs.length}</div></div>
+    <div class="stat"><div class="stat-label">Total Fuel</div><div class="stat-val">${totalL.toFixed(1)} L</div></div>
+    <div class="stat"><div class="stat-label">Total Outlay</div><div class="stat-val">₹${totalCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></div>
+    <div class="stat"><div class="stat-label">Active Cars</div><div class="stat-val">${Object.keys(data.stats_by_car||{}).length}</div></div>`;
+  
+  $('fuel-table').innerHTML = `<thead><tr><th>ID</th><th>Car ID</th><th>Refuel Date</th><th>Volume</th><th>Rate per Litre</th><th>Transaction Total</th><th>Odometer</th><th></th></tr></thead><tbody>`
+    + (logs.length ? logs.map(l=>`<tr>
+      <td><code style="color:var(--muted)">${l.id}</code></td>
+      <td><code style="color:var(--accent)">${l.car_id}</code></td>
+      <td>${l.date}</td>
+      <td><strong>${l.litres.toFixed(1)}</strong> L</td>
+      <td>₹${l.cost_per_litre.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+      <td style="color:var(--accent2); font-weight: 700;">₹${l.total_cost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+      <td>${l.odometer ? l.odometer.toLocaleString() + ' km' : '-'}</td>
+      <td><button class="btn btn-sm btn-outline" onclick="deleteFuel('${l.id}')">Del</button></td>
+    </tr>`).join('') : `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No fuel logs found.</td></tr>`) + '</tbody>';
+}
+
+async function addFuel() {
+  const body = {
+    car_id: val('f-car_id'), 
+    litres: +val('f-litres'), 
+    cost_per_litre: +val('f-cost_per_litre'), 
+    odometer: +val('f-odometer'), 
+    full_tank: true
+  };
+  await api('/fuel', 'POST', body); 
+  
+  $('f-car_id').value = '';
+  $('f-litres').value = '';
+  $('f-cost_per_litre').value = '';
+  $('f-odometer').value = '';
+  loadFuel();
+}
+
+async function deleteFuel(id) { 
+  await api('/fuel/'+id, 'DELETE'); 
+  loadFuel(); 
+}
+
+// ─────────────────────────────────────────────
+//  Insurance Manager Handling
+// ─────────────────────────────────────────────
+async function loadInsurance() {
+  const data = await api('/insurance');
+  const pols = data.policies || [];
+  $('ins-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Active Policies</div><div class="stat-val">${data.total}</div></div>
+    <div class="stat"><div class="stat-label">Premium outlay</div><div class="stat-val">₹${data.total_annual_premium?.toLocaleString('en-IN')}</div></div>
+    <div class="stat"><div class="stat-label">Expiring &lt; 30 Days</div><div class="stat-val" style="color:var(--red)">${data.expiring_soon}</div></div>`;
+    
+  $('ins-cards').innerHTML = pols.map(p=>`
+    <div class="card" style="${p.expiry_alert ? 'border-color: var(--red); box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15)' : ''}">
+      <div class="card-content" style="padding-top: 1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.5rem;">
+          <div class="card-title" style="margin-bottom:0;">${p.provider}</div>
+          ${p.expiry_alert ? '<span class="badge badge-red">⚠ Expiring Soon</span>' : '<span class="badge badge-green">Active</span>'}
+        </div>
+        <div class="card-meta" style="margin-bottom: 0.75rem;">Vehicle: <strong>${p.car?.make||''} ${p.car?.model||''} (${p.car_id})</strong></div>
+        <div class="card-meta">Policy No: <code>${p.policy_no}</code></div>
+        <div class="card-meta">Start Date: <span>${p.start}</span></div>
+        <div class="card-meta">End Date: <span>${p.end}</span></div>
+        
+        <div style="margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:0.72rem; text-transform:uppercase; color:var(--muted)">Annual Cost</div>
+            <div class="card-value">₹${p.premium.toLocaleString('en-IN')}/yr</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span class="badge badge-blue">${p.type}</span>
+            <button class="btn btn-sm btn-outline" onclick="deletePolicy('${p.id}')">Del</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function addPolicy() {
+  const body = {
+    car_id: val('p-car_id'), 
+    provider: val('p-provider'), 
+    policy_no: val('p-policy_no'), 
+    type: val('p-type'), 
+    premium: +val('p-premium'), 
+    start: val('p-start'), 
+    end: val('p-end')
+  };
+  await api('/insurance', 'POST', body); 
+  
+  $('p-car_id').value = '';
+  $('p-provider').value = '';
+  $('p-policy_no').value = '';
+  $('p-premium').value = '';
+  $('p-start').value = '';
+  $('p-end').value = '';
+  loadInsurance();
+}
+
+async function deletePolicy(id) { 
+  await api('/insurance/'+id, 'DELETE'); 
+  loadInsurance(); 
+}
+
+// ─────────────────────────────────────────────
+//  Metrics Dashboard Handling
+// ─────────────────────────────────────────────
+function formatUptime(sec) {
+  if (sec < 60) return sec.toFixed(0) + 's';
+  const min = Math.floor(sec / 60);
+  const remainingSec = Math.floor(sec % 60);
+  if (min < 60) return min + 'm ' + remainingSec + 's';
+  const hrs = Math.floor(min / 60);
+  const remainingMin = min % 60;
+  return hrs + 'h ' + remainingMin + 'm';
+}
+
+function updateMetricsUI(data) {
+  $('met-uptime').textContent = formatUptime(data.uptime_seconds);
+  $('met-requests').textContent = data.requests.total;
+  $('met-cpu').textContent = data.system.cpu_usage.toFixed(1) + '%';
+  $('met-mem').textContent = data.system.memory_usage.toFixed(1) + '%';
+  
+  const ctxSys = $('chart-system').getContext('2d');
+  if (!systemChart) {
+    systemChart = new Chart(ctxSys, {
+      type: 'line',
+      data: {
+        labels: timeLabels,
+        datasets: [
+          {
+            label: 'CPU Utilization (%)',
+            data: systemCpuHistory,
+            borderColor: '#ff5722',
+            backgroundColor: 'rgba(255, 87, 34, 0.08)',
+            borderWidth: 2.5,
+            pointRadius: 2,
+            tension: 0.3,
+            fill: true
+          },
+          {
+            label: 'RAM Load (%)',
+            data: systemMemHistory,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+            borderWidth: 2.5,
+            pointRadius: 2,
+            tension: 0.3,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { family: 'Outfit' } } },
+          x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { family: 'Outfit' } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#f1f5f9', font: { family: 'Outfit', size: 12 } } }
+        }
+      }
+    });
+  } else {
+    systemChart.data.labels = timeLabels;
+    systemChart.data.datasets[0].data = systemCpuHistory;
+    systemChart.data.datasets[1].data = systemMemHistory;
+    systemChart.update('none');
+  }
+  
+  const services = Object.keys(data.requests.by_service);
+  const volumes = [];
+  const latencies = [];
+  
+  services.forEach(svc => {
+    volumes.push(data.requests.by_service[svc].count);
+    latencies.push(data.requests.by_service[svc].avg_latency_ms);
+  });
+  
+  const ctxEnd = $('chart-endpoints').getContext('2d');
+  if (!endpointChart) {
+    endpointChart = new Chart(ctxEnd, {
+      type: 'bar',
+      data: {
+        labels: services,
+        datasets: [
+          {
+            label: 'Total Requests',
+            data: volumes,
+            backgroundColor: 'rgba(255, 179, 0, 0.55)',
+            borderColor: '#ffb300',
+            borderWidth: 1.5,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Latency (ms)',
+            data: latencies,
+            backgroundColor: 'rgba(16, 185, 129, 0.55)',
+            borderColor: '#10b981',
+            borderWidth: 1.5,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            type: 'linear',
+            position: 'left',
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit' } },
+            title: { display: true, text: 'Requests', color: '#ffb300', font: { family: 'Outfit', weight: 'bold' } }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit' } },
+            title: { display: true, text: 'Latency (ms)', color: '#10b981', font: { family: 'Outfit', weight: 'bold' } }
+          },
+          x: { ticks: { color: '#94a3b8', font: { family: 'Outfit' } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#f1f5f9', font: { family: 'Outfit', size: 12 } } }
+        }
+      }
+    });
+  } else {
+    endpointChart.data.labels = services;
+    endpointChart.data.datasets[0].data = volumes;
+    endpointChart.data.datasets[1].data = latencies;
+    endpointChart.update('none');
+  }
+  
+  let html = '';
+  Object.keys(data.db).forEach(col => {
+    html += `<tr>
+      <td><code>/db/${col}</code></td>
+      <td><span class="badge badge-blue">Datastore Collection</span></td>
+      <td>-</td>
+      <td><strong>${data.db[col]}</strong> records</td>
+      <td><span class="badge badge-green">Healthy</span></td>
+    </tr>`;
+  });
+  
+  services.forEach(svc => {
+    const req = data.requests.by_service[svc];
+    let latColor = 'var(--green)';
+    let statusClass = 'badge-green';
+    let statusTxt = 'Optimal';
+    
+    if (req.avg_latency_ms > 100.0) {
+      latColor = 'var(--red)';
+      statusClass = 'badge-red';
+      statusTxt = 'Slow Response';
+    } else if (req.avg_latency_ms > 20.0) {
+      latColor = 'var(--accent2)';
+      statusClass = 'badge-yellow';
+      statusTxt = 'Acceptable';
+    }
+    
+    html += `<tr>
+      <td><code>/api/${svc}</code></td>
+      <td><span class="badge badge-blue">API Microservice</span></td>
+      <td><strong>${req.count}</strong> calls</td>
+      <td style="color:${latColor}; font-weight:700;">${req.avg_latency_ms.toFixed(2)} ms</td>
+      <td><span class="badge ${statusClass}">${statusTxt}</span></td>
+    </tr>`;
+  });
+  
+  $('met-table-body').innerHTML = html || '<tr><td colspan="5" class="loading">No request performance logged yet.</td></tr>';
+}
+
+async function loadMetrics() {
+  try {
+    const data = await api('/metrics');
+    updateMetricsUI(data);
+  } catch (err) {
+    console.error("Immediate metrics update error", err);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Metrics Background Polling Loop
+// ─────────────────────────────────────────────
+async function pollMetrics() {
+  try {
+    const data = await api('/metrics');
+    if (!data) return;
+    
+    const now = new Date().toLocaleTimeString();
+    timeLabels.push(now);
+    systemCpuHistory.push(data.system.cpu_usage);
+    systemMemHistory.push(data.system.memory_usage);
+    
+    if (timeLabels.length > MAX_HISTORY) {
+      timeLabels.shift();
+      systemCpuHistory.shift();
+      systemMemHistory.shift();
+    }
+    
+    let loadColor = 'var(--green)';
+    let loadTxt = 'Optimal';
+    if (data.system.cpu_usage > 85.0 || data.system.memory_usage > 90.0) {
+      loadColor = 'var(--red)';
+      loadTxt = 'Heavy Load';
+    } else if (data.system.cpu_usage > 50.0) {
+      loadColor = 'var(--accent2)';
+      loadTxt = 'Moderate Load';
+    }
+    $('quick-perf-indicator').innerHTML = `Server Health: <span style="color:${loadColor}">${loadTxt}</span> (CPU: ${data.system.cpu_usage.toFixed(0)}%)`;
+    
+    if (currentTab === 'metrics') {
+      updateMetricsUI(data);
+    }
+  } catch (err) {
+    console.error("Background metrics polling failed", err);
+    $('quick-perf-indicator').innerHTML = `Server Health: <span style="color:var(--red)">Offline</span>`;
+  }
+}
+
+const loaders = {
+  inventory: loadInventory,
+  booking: loadBookings,
+  payment: loadPayments,
+  service: loadService,
+  valuation: loadValuation,
+  fuel: loadFuel,
+  insurance: loadInsurance,
+  metrics: loadMetrics
+};
+
+checkAuth();
+pollMetrics();
+setInterval(pollMetrics, 3000);
+</script>
+
+</body>
+</html>
