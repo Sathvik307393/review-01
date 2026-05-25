@@ -712,13 +712,16 @@ function getServiceUrl(service) {
   const host = window.location.hostname;
   const protocol = window.location.protocol;
   
-  if (host === 'localhost' || host === '127.0.0.1') {
-    return `${protocol}//${host}:${LOCAL_PORTS[service]}/api/${service}`;
-  } else {
+  const isProdDomain = host.endsWith("sathvikdevops.site");
+  
+  if (isProdDomain) {
     // Domain-based routing in production: e.g., auth.yourdomain.com, inventory.yourdomain.com
     const parts = host.split('.');
     const parentDomain = parts.length > 2 ? parts.slice(1).join('.') : host;
     return `${protocol}//${service}.${parentDomain}/api/${service}`;
+  } else {
+    // Fallback for localhost, local IPs, or custom local domains
+    return `${protocol}//${host || 'localhost'}:${LOCAL_PORTS[service]}/api/${service}`;
   }
 }
 
